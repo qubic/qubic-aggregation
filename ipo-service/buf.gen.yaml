@@ -1,0 +1,18 @@
+version: v2
+inputs:
+  - directory: api
+plugins:
+  - remote: buf.build/protocolbuffers/go
+    out: api
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go
+    out: api
+    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway
+    out: api
+    opt: paths=source_relative
+  - local: protoc-gen-openapi
+    out: api
+    opt:
+      - default_response=false
+    strategy: all

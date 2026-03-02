@@ -1,0 +1,104 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Qubic IPO Aggregation Service
+    description: API for querying transactions related to smart contract IPO bids.
+    version: 1.0.0
+servers:
+    - url: https://TO-DEFINE
+paths:
+    /getCurrentIpoBids:
+        post:
+            tags:
+                - AggregationIpoService
+            summary: Get bidder bid transactions for currently active IPOs.
+            description: Allows for requesting the transactions associated with bids of currently active IPOs for a number of bidder identities.
+            operationId: AggregationIpoService_GetCurrentIpoBids
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetCurrentIpoBidsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCurrentIpoBidsResponse'
+components:
+    schemas:
+        BidTransaction:
+            type: object
+            properties:
+                hash:
+                    type: string
+                amount:
+                    type: string
+                source:
+                    type: string
+                destination:
+                    type: string
+                tickNumber:
+                    type: integer
+                    format: uint32
+                timestamp:
+                    type: string
+                inputType:
+                    type: integer
+                    format: uint32
+                inputSize:
+                    type: integer
+                    format: uint32
+                inputData:
+                    type: string
+                signature:
+                    type: string
+                moneyFlew:
+                    type: boolean
+                bid:
+                    $ref: '#/components/schemas/IpoBid'
+        GetCurrentIpoBidsRequest:
+            type: object
+            properties:
+                identities:
+                    type: array
+                    items:
+                        type: string
+        GetCurrentIpoBidsResponse:
+            type: object
+            properties:
+                ipoTransactions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/IpoBidTransactions'
+        IpoBid:
+            type: object
+            properties:
+                price:
+                    type: string
+                quantity:
+                    type: integer
+                    format: uint32
+        IpoBidTransactions:
+            type: object
+            properties:
+                assetName:
+                    type: string
+                contractIndex:
+                    type: integer
+                    format: uint32
+                contractAddress:
+                    type: string
+                transactions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/BidTransaction'
+tags:
+    - name: AggregationIpoService
+externalDocs:
+    description: GitHub
+    url: https://github.com/qubic/qubic-aggregation

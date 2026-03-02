@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package qubic.aggregation.ipo.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/api/annotations.proto";
+import "qubic/aggregation/ipo/v1/messages.proto";
+option go_package = "github.com/qubic/qubic-aggregation/ipo-service/api/ipo/v1";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "Qubic IPO Aggregation Service"
+    description: "API for querying transactions related to smart contract IPO bids."
+    version: "1.0.0"
+  }
+
+  servers: [
+    {
+      // TODO:
+      url: "https://TO-DEFINE"
+    }
+  ]
+
+  external_docs: {
+    description: "GitHub"
+    url: "https://github.com/qubic/qubic-aggregation"
+  }
+
+};
+
+
+service AggregationIpoService {
+
+  rpc GetCurrentIpoBids(GetCurrentIpoBidsRequest) returns (GetCurrentIpoBidsResponse) {
+
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Get bidder bid transactions for currently active IPOs."
+      description: "Allows for requesting the transactions associated with bids of currently active IPOs for a number of bidder identities."
+    };
+
+    option (google.api.http) = {
+      post: "/getCurrentIpoBids"
+      body: "*"
+      response_body: "ipo_transactions"
+    };
+  }
+}
