@@ -58,4 +58,4 @@ jobs:
           context: ./ipo-service
           file: ./ipo-service/Dockerfile
           push: true
-          tags: ghcr.io/qubic/ipo-service:${{ steps.extract.outputs.version }}
+          tags: ghcr.io/qubic/qubic-ipo-aggregation:${{ steps.extract.outputs.version }}
