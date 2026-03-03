@@ -6,10 +6,10 @@ exposes the results via its own gRPC + HTTP/REST API.
 
 ## Services
 
-| Service                     | Description                                                    | Status      |
-|-----------------------------|----------------------------------------------------------------|-------------|
-| [ipo-service](ipo-service/) | IPO bid aggregation for wallet integration                     | Implemented |
-| [shared](shared/)           | Common infrastructure (gRPC client/server, config, middleware) | Implemented |
+| Service                               | Description                                                    | Status      |
+|---------------------------------------|----------------------------------------------------------------|-------------|
+| [general-service](general-service/)   | IPO bid aggregation and identity balances                      | Implemented |
+| [shared](shared/)                     | Common infrastructure (gRPC client/server, config, middleware) | Implemented |
 
 ## Architecture
 
@@ -18,9 +18,9 @@ exposes the results via its own gRPC + HTTP/REST API.
                                  |
                     +------------v------------+
                     |    Aggregation Layer    |
-                    |  +-------------------+  |
-                    |  |   ipo-service     |  |
-                    |  +--------+----------+  |
+                    |  +---------------------+  |
+                    |  |  general-service    |  |
+                    |  +--------+-----------+  |
                     |           |             |
                     |  +--------v----------+  |
                     |  |  shared module    |  |

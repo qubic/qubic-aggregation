@@ -1,0 +1,29 @@
+name: Test general-service
+
+on:
+  push:
+    paths:
+      - 'general-service/**'
+      - 'shared/**'
+  pull_request:
+    paths:
+      - 'general-service/**'
+      - 'shared/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./general-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: general-service/go.mod
+
+      - name: Run tests
+        run: go test ./...

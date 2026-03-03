@@ -1,0 +1,164 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Qubic General Aggregation Service
+    description: General API for aggregated data / requests.
+    version: 1.0.0
+servers:
+    - url: https://TO-DEFINE
+paths:
+    /getCurrentIpoBids:
+        post:
+            tags:
+                - AggregationGeneralService
+            summary: Get bidder bid transactions for currently active IPOs.
+            description: Allows for requesting the transactions associated with bids of currently active IPOs for a number of bidder identities.
+            operationId: AggregationGeneralService_GetCurrentIpoBids
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetCurrentIpoBidsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCurrentIpoBidsResponse'
+    /getIdentitiesBalances:
+        post:
+            tags:
+                - AggregationGeneralService
+            summary: Get balances for a list of identities.
+            description: Allows for requesting the balances for a number of Qubic wallet identities.
+            operationId: AggregationGeneralService_GetIdentitiesBalances
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetIdentitiesBalancesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetIdentitiesBalancesResponse'
+components:
+    schemas:
+        BidTransaction:
+            type: object
+            properties:
+                hash:
+                    type: string
+                amount:
+                    type: string
+                source:
+                    type: string
+                destination:
+                    type: string
+                tickNumber:
+                    type: integer
+                    format: uint32
+                timestamp:
+                    type: string
+                inputType:
+                    type: integer
+                    format: uint32
+                inputSize:
+                    type: integer
+                    format: uint32
+                inputData:
+                    type: string
+                signature:
+                    type: string
+                moneyFlew:
+                    type: boolean
+                bid:
+                    $ref: '#/components/schemas/IpoBid'
+        GetCurrentIpoBidsRequest:
+            type: object
+            properties:
+                identities:
+                    type: array
+                    items:
+                        type: string
+        GetCurrentIpoBidsResponse:
+            type: object
+            properties:
+                ipoTransactions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/IpoBidTransactions'
+        GetIdentitiesBalancesRequest:
+            type: object
+            properties:
+                identities:
+                    type: array
+                    items:
+                        type: string
+        GetIdentitiesBalancesResponse:
+            type: object
+            properties:
+                balances:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/IdentityBalance'
+        IdentityBalance:
+            type: object
+            properties:
+                id:
+                    type: string
+                balance:
+                    type: string
+                validForTick:
+                    type: integer
+                    format: uint32
+                latestIncomingTransferTick:
+                    type: integer
+                    format: uint32
+                latestOutgoingTransferTick:
+                    type: integer
+                    format: uint32
+                incomingAmount:
+                    type: string
+                outgoingAmount:
+                    type: string
+                numberOfIncomingTransfers:
+                    type: integer
+                    format: uint32
+                numberOfOutgoingTransfers:
+                    type: integer
+                    format: uint32
+        IpoBid:
+            type: object
+            properties:
+                price:
+                    type: string
+                quantity:
+                    type: integer
+                    format: uint32
+        IpoBidTransactions:
+            type: object
+            properties:
+                assetName:
+                    type: string
+                contractIndex:
+                    type: integer
+                    format: uint32
+                contractAddress:
+                    type: string
+                transactions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/BidTransaction'
+tags:
+    - name: AggregationGeneralService
+externalDocs:
+    description: GitHub
+    url: https://github.com/qubic/qubic-aggregation

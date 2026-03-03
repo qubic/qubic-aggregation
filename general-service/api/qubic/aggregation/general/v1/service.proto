@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package qubic.aggregation.general.v1;
+
+import "gnostic/openapi/v3/annotations.proto";
+import "google/api/annotations.proto";
+import "qubic/aggregation/general/v1/messages.proto";
+option go_package = "github.com/qubic/qubic-aggregation/general-service/api/general/v1";
+
+option (gnostic.openapi.v3.document) = {
+  info: {
+    title: "Qubic General Aggregation Service"
+    description: "General API for aggregated data / requests."
+    version: "1.0.0"
+  }
+
+  servers: [
+    {
+      // TODO:
+      url: "https://TO-DEFINE"
+    }
+  ]
+
+  external_docs: {
+    description: "GitHub"
+    url: "https://github.com/qubic/qubic-aggregation"
+  }
+
+};
+
+
+service AggregationGeneralService {
+
+  rpc GetCurrentIpoBids(GetCurrentIpoBidsRequest) returns (GetCurrentIpoBidsResponse) {
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Get bidder bid transactions for currently active IPOs."
+      description: "Allows for requesting the transactions associated with bids of currently active IPOs for a number of bidder identities."
+    };
+
+    option (google.api.http) = {
+      post: "/getCurrentIpoBids"
+      body: "*"
+      response_body: "ipo_transactions"
+    };
+  }
+
+  rpc GetIdentitiesBalances(GetIdentitiesBalancesRequest) returns (GetIdentitiesBalancesResponse) {
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Get balances for a list of identities."
+      description: "Allows for requesting the balances for a number of Qubic wallet identities."
+    };
+
+    option (google.api.http) = {
+      post: "/getIdentitiesBalances"
+      body: "*"
+      response_body: "balances"
+    };
+  }
+
+}
