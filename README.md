@@ -18,9 +18,9 @@ exposes the results via its own gRPC + HTTP/REST API.
                                  |
                     +------------v------------+
                     |    Aggregation Layer    |
-                    |  +---------------------+  |
-                    |  |  general-service    |  |
-                    |  +--------+-----------+  |
+                    |  +-------------------+  |
+                    |  |  general-service  |  |
+                    |  +--------+----------+  |
                     |           |             |
                     |  +--------v----------+  |
                     |  |  shared module    |  |
