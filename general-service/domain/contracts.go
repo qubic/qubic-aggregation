@@ -27,12 +27,13 @@ func ParseBidInputData(inputData string) (IpoBid, error) {
 		return IpoBid{}, fmt.Errorf("decoding base64 input data: %w", err)
 	}
 
-	if len(data) != 10 {
-		return IpoBid{}, fmt.Errorf("unexpected input data size: got %d, expected 10", len(data))
+	if len(data) != 16 {
+		return IpoBid{}, fmt.Errorf("unexpected input data size: got %d, expected 16", len(data))
 	}
 
 	price := int64(binary.LittleEndian.Uint64(data[0:8]))
 	quantity := binary.LittleEndian.Uint16(data[8:10])
+	// bytes 10-15 are struct padding, discarded
 
 	return IpoBid{
 		Price:    price,

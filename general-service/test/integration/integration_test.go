@@ -146,7 +146,7 @@ func startServer(t *testing.T, register func(s *grpc.Server)) *grpc.ClientConn {
 // ---------------------------------------------------------------------------
 
 func makeBidInputData(price int64, quantity uint16) string {
-	var buf [10]byte
+	var buf [16]byte
 	binary.LittleEndian.PutUint64(buf[0:8], uint64(price))
 	binary.LittleEndian.PutUint16(buf[8:10], quantity)
 	return base64.StdEncoding.EncodeToString(buf[:])
@@ -183,7 +183,7 @@ func TestIntegration_CorrectQueryParameters(t *testing.T) {
 
 	env.fakeQuery.responses[identity] = &queryProto.GetTransactionsForIdentityResponse{
 		Hits:         &queryProto.Hits{Total: 1},
-		Transactions: []*queryProto.Transaction{{Hash: "h1", InputSize: 10, Amount: 0, InputData: makeBidInputData(42, 1)}},
+		Transactions: []*queryProto.Transaction{{Hash: "h1", InputSize: 16, Amount: 0, InputData: makeBidInputData(42, 1)}},
 	}
 
 	_, err = env.bidService.GetCurrentIPOBidTransactions(ctx, []string{identity})
@@ -245,14 +245,14 @@ func TestIntegration_EndToEnd(t *testing.T) {
 	env.fakeQuery.responses[id1] = &queryProto.GetTransactionsForIdentityResponse{
 		Hits: &queryProto.Hits{Total: 1},
 		Transactions: []*queryProto.Transaction{
-			{Hash: "tx1", InputSize: 10, Amount: 0, Source: id1, Destination: addr5, TickNumber: 200, InputData: makeBidInputData(100, 2), MoneyFlew: true},
-			{Hash: "tx2", InputSize: 10, Amount: 0, Source: id1, Destination: addr7, TickNumber: 300, InputData: makeBidInputData(200, 3), MoneyFlew: true},
+			{Hash: "tx1", InputSize: 16, Amount: 0, Source: id1, Destination: addr5, TickNumber: 200, InputData: makeBidInputData(100, 2), MoneyFlew: true},
+			{Hash: "tx2", InputSize: 16, Amount: 0, Source: id1, Destination: addr7, TickNumber: 300, InputData: makeBidInputData(200, 3), MoneyFlew: true},
 		},
 	}
 	env.fakeQuery.responses[id2] = &queryProto.GetTransactionsForIdentityResponse{
 		Hits: &queryProto.Hits{Total: 1},
 		Transactions: []*queryProto.Transaction{
-			{Hash: "tx3", InputSize: 10, Amount: 0, Source: id2, Destination: addr5, TickNumber: 400, InputData: makeBidInputData(50, 1), MoneyFlew: false},
+			{Hash: "tx3", InputSize: 16, Amount: 0, Source: id2, Destination: addr5, TickNumber: 400, InputData: makeBidInputData(50, 1), MoneyFlew: false},
 		},
 	}
 
@@ -264,7 +264,7 @@ func TestIntegration_EndToEnd(t *testing.T) {
 	// the fake returns the same response regardless of destination filter.
 	// Note: in a real scenario the upstream would filter by destination, but our fake
 	// returns all configured transactions for the identity. The client does post-filter
-	// by InputSize==10 && Amount==0, which all pass here.
+	// by InputSize==16 && Amount==0, which all pass here.
 	alphaIPO := result[0]
 	assert.Equal(t, "ALPHA", alphaIPO.AssetName)
 	assert.Equal(t, uint32(5), alphaIPO.ContractIndex)
@@ -313,12 +313,12 @@ func TestIntegration_PostFiltering(t *testing.T) {
 	env.fakeQuery.responses[identity] = &queryProto.GetTransactionsForIdentityResponse{
 		Hits: &queryProto.Hits{Total: 3},
 		Transactions: []*queryProto.Transaction{
-			// Valid bid: InputSize==10, Amount==0.
-			{Hash: "valid", InputSize: 10, Amount: 0, InputData: makeBidInputData(42, 1)},
+			// Valid bid: InputSize==16, Amount==0.
+			{Hash: "valid", InputSize: 16, Amount: 0, InputData: makeBidInputData(42, 1)},
 			// Wrong InputSize.
 			{Hash: "wrong_size", InputSize: 8, Amount: 0, InputData: "AAAAAAAAAAAAAAAA"},
 			// Non-zero Amount.
-			{Hash: "wrong_amount", InputSize: 10, Amount: 100, InputData: makeBidInputData(99, 2)},
+			{Hash: "wrong_amount", InputSize: 16, Amount: 100, InputData: makeBidInputData(99, 2)},
 		},
 	}
 

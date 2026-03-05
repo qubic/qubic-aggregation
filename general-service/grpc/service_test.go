@@ -42,7 +42,7 @@ func TestGetCurrentIpoBids_Success(t *testing.T) {
 					TickNumber:  500,
 					Timestamp:   12345,
 					InputType:   1,
-					InputSize:   10,
+					InputSize:   16,
 					InputData:   "data",
 					Signature:   "sig",
 					MoneyFlew:   true,
@@ -70,7 +70,7 @@ func TestGetCurrentIpoBids_Success(t *testing.T) {
 	assert.Equal(t, uint32(500), tx.TickNumber)
 	assert.Equal(t, uint64(12345), tx.Timestamp)
 	assert.Equal(t, uint32(1), tx.InputType)
-	assert.Equal(t, uint32(10), tx.InputSize)
+	assert.Equal(t, uint32(16), tx.InputSize)
 	assert.Equal(t, "data", tx.InputData)
 	assert.Equal(t, "sig", tx.Signature)
 	assert.True(t, tx.MoneyFlew)

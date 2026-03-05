@@ -17,7 +17,7 @@ import (
 )
 
 func makeBidInputData(price int64, quantity uint16) string {
-	var buf [10]byte
+	var buf [16]byte
 	binary.LittleEndian.PutUint64(buf[0:8], uint64(price))
 	binary.LittleEndian.PutUint16(buf[8:10], quantity)
 	return base64.StdEncoding.EncodeToString(buf[:])
@@ -46,7 +46,7 @@ func TestGetIPOBidTransactionsForIdentity_SinglePage(t *testing.T) {
 				TickNumber:  500,
 				Timestamp:   12345,
 				InputType:   1,
-				InputSize:   10,
+				InputSize:   16,
 				InputData:   inputData,
 				Signature:   "sig",
 				MoneyFlew:   true,
@@ -74,9 +74,9 @@ func TestGetIPOBidTransactionsForIdentity_FiltersOutNonBidTransactions(t *testin
 	mock.EXPECT().GetTransactionsForIdentity(ctx, gomock.Any()).Return(&queryProto.GetTransactionsForIdentityResponse{
 		Hits: &queryProto.Hits{Total: 4},
 		Transactions: []*queryProto.Transaction{
-			{Hash: "valid", InputSize: 10, Amount: 0, InputData: inputData},
+			{Hash: "valid", InputSize: 16, Amount: 0, InputData: inputData},
 			{Hash: "wrong_size", InputSize: 8, Amount: 0, InputData: "garbage"},
-			{Hash: "wrong_amount", InputSize: 10, Amount: 100, InputData: inputData},
+			{Hash: "wrong_amount", InputSize: 16, Amount: 100, InputData: inputData},
 			{Hash: "both_wrong", InputSize: 5, Amount: 50, InputData: "garbage"},
 		},
 	}, nil)
@@ -97,7 +97,7 @@ func TestGetIPOBidTransactionsForIdentity_Pagination(t *testing.T) {
 	page1Txs := make([]*queryProto.Transaction, 1000)
 	for i := range page1Txs {
 		page1Txs[i] = &queryProto.Transaction{
-			Hash: fmt.Sprintf("tx_%d", i), InputSize: 10, InputData: inputData,
+			Hash: fmt.Sprintf("tx_%d", i), InputSize: 16, InputData: inputData,
 		}
 	}
 
@@ -105,7 +105,7 @@ func TestGetIPOBidTransactionsForIdentity_Pagination(t *testing.T) {
 	page2Txs := make([]*queryProto.Transaction, 500)
 	for i := range page2Txs {
 		page2Txs[i] = &queryProto.Transaction{
-			Hash: fmt.Sprintf("tx_%d", 1000+i), InputSize: 10, InputData: inputData,
+			Hash: fmt.Sprintf("tx_%d", 1000+i), InputSize: 16, InputData: inputData,
 		}
 	}
 

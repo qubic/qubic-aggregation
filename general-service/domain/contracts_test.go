@@ -61,7 +61,7 @@ func TestContractIndexToAddress_KnownAddresses(t *testing.T) {
 
 func TestParseBidInputData(t *testing.T) {
 	t.Run("valid data", func(t *testing.T) {
-		var buf [10]byte
+		var buf [16]byte
 		binary.LittleEndian.PutUint64(buf[0:8], uint64(1000))
 		binary.LittleEndian.PutUint16(buf[8:10], 5)
 		encoded := base64.StdEncoding.EncodeToString(buf[:])
@@ -73,7 +73,7 @@ func TestParseBidInputData(t *testing.T) {
 	})
 
 	t.Run("max values", func(t *testing.T) {
-		var buf [10]byte
+		var buf [16]byte
 		binary.LittleEndian.PutUint64(buf[0:8], ^uint64(0)>>1) // max int64
 		binary.LittleEndian.PutUint16(buf[8:10], 0xFFFF)
 		encoded := base64.StdEncoding.EncodeToString(buf[:])
@@ -98,7 +98,7 @@ func TestParseBidInputData(t *testing.T) {
 	})
 
 	t.Run("wrong length long", func(t *testing.T) {
-		encoded := base64.StdEncoding.EncodeToString(make([]byte, 12))
+		encoded := base64.StdEncoding.EncodeToString(make([]byte, 20))
 		_, err := ParseBidInputData(encoded)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "unexpected input data size")

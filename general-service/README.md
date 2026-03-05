@@ -87,8 +87,8 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 2. Derives smart contract addresses from contract indices (contract index in lower 32 bits of the 256-bit public key, remaining bits zeroed).
 3. Gets current epoch tick bounds from status-service (`GetTickIntervals`), cached with configurable TTL.
 4. For each identity, queries archive-query-service (`GetTransactionsForIdentity`) with destination = SC address, tick range = current epoch, amount = 0.
-5. Filters results by `input_size == 10` and `amount == 0` to isolate IPO bid transactions.
-6. Parses `input_data` (base64) as `ContractIPOBid`: price (int64 LE, 8 bytes) + quantity (uint16 LE, 2 bytes).
+5. Filters results by `input_size == 16` and `amount == 0` to isolate IPO bid transactions.
+6. Parses `input_data` (base64) as `ContractIPOBid`: price (int64 LE, 8 bytes) + quantity (uint16 LE, 2 bytes) + padding (6 bytes).
 
 ### Identity Balances
 

@@ -59,7 +59,7 @@ func (qsc *QueryServiceClient) GetIPOBidTransactionsForIdentity(
 		}
 
 		for _, tx := range resp.Transactions {
-			if tx.InputSize != 10 || tx.Amount != 0 {
+			if tx.InputSize != 16 || tx.Amount != 0 {
 				continue
 			}
 
