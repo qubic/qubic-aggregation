@@ -34,7 +34,7 @@ func main() {
 	}
 }
 
-const confPrefix = "QUBIC_AGGREGATION_GENERAL_SERVICE"
+const confPrefix = "QUBIC_AGGREGATION_SERVICE"
 
 func run(logger *zap.SugaredLogger) error {
 
@@ -59,21 +59,21 @@ func run(logger *zap.SugaredLogger) error {
 
 	fmt.Println(conf.String(&cfg))
 
-	liveServiceGrpcConn, err := grpcclient.NewConnection(cfg.Upstream.QubicHttpHost)
+	liveServiceGrpcConn, err := grpcclient.NewConnection(cfg.Upstream.QubicHttpUrl)
 	if err != nil {
 		return fmt.Errorf("creating live service client connection: %w", err)
 	}
 	defer liveServiceGrpcConn.Close()
 	liveClient := clients.NewLiveServiceClient(liveServiceGrpcConn, logger.Named("live-service"))
 
-	queryServiceGrpcConn, err := grpcclient.NewConnection(cfg.Upstream.ArchiveQueryServiceHost)
+	queryServiceGrpcConn, err := grpcclient.NewConnection(cfg.Upstream.QueryServiceUrl)
 	if err != nil {
 		return fmt.Errorf("creating query service client connection: %w", err)
 	}
 	defer queryServiceGrpcConn.Close()
 	queryClient := clients.NewQueryServiceClient(queryServiceGrpcConn, logger.Named("query-service"))
 
-	statusServiceGrpcConn, err := grpcclient.NewConnection(cfg.Upstream.StatusServiceHost)
+	statusServiceGrpcConn, err := grpcclient.NewConnection(cfg.Upstream.StatusServiceUrl)
 	if err != nil {
 		return fmt.Errorf("creating status service client connection: %w", err)
 	}

@@ -58,4 +58,4 @@ jobs:
           context: ./general-service
           file: ./general-service/Dockerfile
           push: true
-          tags: ghcr.io/qubic/qubic-aggregation-general-service:${{ steps.extract.outputs.version }}
+          tags: ghcr.io/qubic/qubic-aggregation-service:${{ steps.extract.outputs.version }}

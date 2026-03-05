@@ -70,8 +70,8 @@ github.com/qubic/go-node-connector v0.17.0 h1:ifsqODfO3vw16av0GGQBcq8qgcQXfYD1Y4
 github.com/qubic/go-node-connector v0.17.0/go.mod h1:GOQGJ6IKhm3CU62bfLJJbBerjYmt6NNhDKzxC1i7HhU=
 github.com/qubic/go-schnorrq v1.0.1 h1:F0R/BQVf+O7Bp57NGJmc3uXlqsaIzerg/1bmU4jMLLE=
 github.com/qubic/go-schnorrq v1.0.1/go.mod h1:j2qw/zHiyjH9GAScAAETWpZk6iELbjYnzIg7CQwc5wM=
-github.com/qubic/qubic-aggregation/shared v0.1.0 h1:D0qz928JyAQZhqpZJm+4xyocFb62zivOA6A/trYVELU=
-github.com/qubic/qubic-aggregation/shared v0.1.0/go.mod h1:M4YnGXPEvT2+K7c21nIYdpSUm8uEtdc2cJaQvUaEF+U=
+github.com/qubic/qubic-aggregation/shared v0.1.1 h1:t5eLjPvmY/2eW0tgDBV9O/ZQ2+YkdhFdS7hIS5pMvkM=
+github.com/qubic/qubic-aggregation/shared v0.1.1/go.mod h1:M4YnGXPEvT2+K7c21nIYdpSUm8uEtdc2cJaQvUaEF+U=
 github.com/qubic/qubic-http v0.9.1 h1:B45EQFAHASrzsTHU98KgmqqVh+cEhfiSAwUP7BmnNCI=
 github.com/qubic/qubic-http v0.9.1/go.mod h1:d+vpgJACx4OLDLmQOXY0J0ObBwDjLNs9hU0+QR5cW/k=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=

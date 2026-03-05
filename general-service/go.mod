@@ -11,11 +11,12 @@ require (
 	github.com/qubic/archive-query-service/v2 v2.0.0-20260218114203-dee9e270b172
 	github.com/qubic/go-data-publisher/status-service v1.3.3
 	github.com/qubic/go-node-connector v0.17.0
-	github.com/qubic/qubic-aggregation/shared v0.1.0
+	github.com/qubic/qubic-aggregation/shared v0.1.1
 	github.com/qubic/qubic-http v0.9.1
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/mock v0.6.0
 	go.uber.org/zap v1.27.1
+	golang.org/x/sync v0.19.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260223185530-2f722ef697dc
 	google.golang.org/grpc v1.79.1
 	google.golang.org/protobuf v1.36.11
@@ -44,7 +45,6 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.47.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260217215200-42d3e9bedb6d // indirect
