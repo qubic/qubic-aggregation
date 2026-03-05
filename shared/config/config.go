@@ -19,7 +19,7 @@ type Metrics struct {
 }
 
 type Upstream struct {
-	ArchiveQueryServiceHost string `conf:"default:localhost:8001"`
-	QubicHttpHost           string `conf:"default:localhost:8001"`
-	StatusServiceHost       string `conf:"default:localhost:9901"`
+	QueryServiceUrl  string `conf:"default:localhost:8001"`
+	QubicHttpUrl     string `conf:"default:localhost:8001"`
+	StatusServiceUrl string `conf:"default:localhost:9901"`
 }
