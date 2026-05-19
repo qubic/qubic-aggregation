@@ -82,8 +82,9 @@ func run(logger *zap.SugaredLogger) error {
 
 	bidService := domain.NewBidService(logger.Named("bid-service"), liveClient, statusClient, queryClient, cfg.Cache.IpoTtl, cfg.Cache.TickIntervalsTtl)
 	balancesService := domain.NewBalancesService(logger.Named("balances-service"), liveClient)
+	assetsService := domain.NewAssetsService(logger.Named("assets-service"), liveClient)
 
-	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService)
+	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService, assetsService)
 
 	errChan := make(chan error, 1)
 

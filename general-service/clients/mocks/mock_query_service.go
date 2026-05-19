@@ -63,24 +63,24 @@ func (mr *MockArchiveQueryServiceClientMockRecorder) GetComputorsListsForEpoch(c
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComputorsListsForEpoch", reflect.TypeOf((*MockArchiveQueryServiceClient)(nil).GetComputorsListsForEpoch), varargs...)
 }
 
-// GetEvents mocks base method.
-func (m *MockArchiveQueryServiceClient) GetEvents(ctx context.Context, in *api.GetEventsRequest, opts ...grpc.CallOption) (*api.GetEventsResponse, error) {
+// GetEventLogs mocks base method.
+func (m *MockArchiveQueryServiceClient) GetEventLogs(ctx context.Context, in *api.GetEventLogsRequest, opts ...grpc.CallOption) (*api.GetEventLogsResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetEvents", varargs...)
-	ret0, _ := ret[0].(*api.GetEventsResponse)
+	ret := m.ctrl.Call(m, "GetEventLogs", varargs...)
+	ret0, _ := ret[0].(*api.GetEventLogsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetEvents indicates an expected call of GetEvents.
-func (mr *MockArchiveQueryServiceClientMockRecorder) GetEvents(ctx, in any, opts ...any) *gomock.Call {
+// GetEventLogs indicates an expected call of GetEventLogs.
+func (mr *MockArchiveQueryServiceClientMockRecorder) GetEventLogs(ctx, in any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEvents", reflect.TypeOf((*MockArchiveQueryServiceClient)(nil).GetEvents), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEventLogs", reflect.TypeOf((*MockArchiveQueryServiceClient)(nil).GetEventLogs), varargs...)
 }
 
 // GetHealth mocks base method.

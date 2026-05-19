@@ -1,6 +1,6 @@
 # General Service
 
-General-purpose aggregation service. Currently provides IPO bid transaction aggregation and batch identity balance lookups.
+General-purpose aggregation service. Currently provides IPO bid transaction aggregation, batch identity balance lookups, and batch asset (owned + possessed) lookups.
 
 ## API
 
@@ -79,6 +79,48 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 }
 ```
 
+### `GetIdentitiesAssets`
+
+**gRPC**: `qubic.aggregation.general.v1.AggregationGeneralService/GetIdentitiesAssets`
+**HTTP**: `POST /getIdentitiesAssets`
+
+**Request**: up to 15 identity strings.
+
+```json
+{
+  "identities": ["IDENTITY_A", "IDENTITY_B"]
+}
+```
+
+**Response**: flat array of asset balances, one entry per `(public_id, asset_name, issuer_identity, contract_index)`. Both owned and possessed amounts are returned in the same entry; an absent side has its amount and tick set to 0.
+
+```json
+{
+  "assets": [
+    {
+      "public_id": "IDENTITY_A",
+      "asset_name": "CFB",
+      "issuer_identity": "CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL",
+      "contract_index": 1,
+      "owned_amount": 1000,
+      "possessed_amount": 1000,
+      "owned_valid_for_tick": 22451873,
+      "possessed_valid_for_tick": 22451873
+    },
+    {
+      "public_id": "IDENTITY_A",
+      "asset_name": "QFT",
+      "issuer_identity": "TFUYVBXYIYBVTEMJHAJGEJOOZHJBQFVQLTBBKMEHPEVIZFXZRPEYFUWGTIWG",
+      "contract_index": 1,
+      "owned_amount": 50,
+      "possessed_amount": 0,
+      "owned_valid_for_tick": 22451873,
+      "possessed_valid_for_tick": 0
+    }
+  ]
+}
+```
+
 ## How It Works
 
 ### IPO Bids
@@ -95,6 +137,12 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 1. For each identity, concurrently fetches the balance from qubic-http (`GetBalance`).
 2. Returns all balance fields (current balance, transfer ticks, amounts, transfer counts).
 
+### Identity Assets
+
+1. For each identity, concurrently fetches owned assets (`GetOwnedAssets`) and possessed assets (`GetPossessedAssets`) from qubic-http.
+2. Merges the two views per `(asset_name, issuer_identity, contract_index)` so a single entry carries both `owned_amount` and `possessed_amount`. Each side keeps its own `valid_for_tick`.
+3. Returns a flat array across all requested identities.
+
 ## Upstream Dependencies
 
 | Service | Method | Purpose |
@@ -102,6 +150,8 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 | qubic-http | `GetActiveIpos` | Active IPO contract indices |
 | qubic-http | `GetTickInfo` | Current epoch for tick range |
 | qubic-http | `GetBalance` | Identity balance data |
+| qubic-http | `GetOwnedAssets` | Owned asset holdings per identity |
+| qubic-http | `GetPossessedAssets` | Possessed asset holdings per identity |
 | status-service | `GetTickIntervals` | Epoch tick boundaries |
 | archive-query-service | `GetTransactionsForIdentity` | Bid transaction queries |
 

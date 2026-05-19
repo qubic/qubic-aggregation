@@ -29,8 +29,10 @@ import (
 
 type fakeLiveService struct {
 	protobuff.UnimplementedQubicLiveServiceServer
-	activeIpos []*protobuff.Ipo
-	tickInfo   *protobuff.TickInfo
+	activeIpos      []*protobuff.Ipo
+	tickInfo        *protobuff.TickInfo
+	ownedAssets     map[string][]*protobuff.OwnedAsset     // keyed by identity
+	possessedAssets map[string][]*protobuff.PossessedAsset // keyed by identity
 }
 
 func (f *fakeLiveService) GetActiveIpos(_ context.Context, _ *emptypb.Empty) (*protobuff.GetActiveIposResponse, error) {
@@ -39,6 +41,14 @@ func (f *fakeLiveService) GetActiveIpos(_ context.Context, _ *emptypb.Empty) (*p
 
 func (f *fakeLiveService) GetTickInfo(_ context.Context, _ *emptypb.Empty) (*protobuff.GetTickInfoResponse, error) {
 	return &protobuff.GetTickInfoResponse{TickInfo: f.tickInfo}, nil
+}
+
+func (f *fakeLiveService) GetOwnedAssets(_ context.Context, req *protobuff.OwnedAssetsRequest) (*protobuff.OwnedAssetsResponse, error) {
+	return &protobuff.OwnedAssetsResponse{OwnedAssets: f.ownedAssets[req.Identity]}, nil
+}
+
+func (f *fakeLiveService) GetPossessedAssets(_ context.Context, req *protobuff.PossessedAssetsRequest) (*protobuff.PossessedAssetsResponse, error) {
+	return &protobuff.PossessedAssetsResponse{PossessedAssets: f.possessedAssets[req.Identity]}, nil
 }
 
 type fakeStatusService struct {
@@ -79,16 +89,20 @@ func (f *fakeQueryService) GetTransactionsForIdentity(_ context.Context, req *qu
 const bufSize = 1024 * 1024
 
 type testEnv struct {
-	fakeLive   *fakeLiveService
-	fakeStatus *fakeStatusService
-	fakeQuery  *fakeQueryService
-	bidService *domain.BidService
+	fakeLive      *fakeLiveService
+	fakeStatus    *fakeStatusService
+	fakeQuery     *fakeQueryService
+	bidService    *domain.BidService
+	assetsService *domain.AssetsService
 }
 
 func newTestEnv(t *testing.T) *testEnv {
 	t.Helper()
 
-	fakeLive := &fakeLiveService{}
+	fakeLive := &fakeLiveService{
+		ownedAssets:     make(map[string][]*protobuff.OwnedAsset),
+		possessedAssets: make(map[string][]*protobuff.PossessedAsset),
+	}
 	fakeStatus := &fakeStatusService{}
 	fakeQuery := &fakeQueryService{responses: make(map[string]*queryProto.GetTransactionsForIdentityResponse)}
 
@@ -109,12 +123,14 @@ func newTestEnv(t *testing.T) *testEnv {
 	queryClient := clients.NewQueryServiceClient(queryConn, logger)
 
 	bidService := domain.NewBidService(logger, liveClient, statusClient, queryClient, 1*time.Minute, 1*time.Minute)
+	assetsService := domain.NewAssetsService(logger, liveClient)
 
 	return &testEnv{
-		fakeLive:   fakeLive,
-		fakeStatus: fakeStatus,
-		fakeQuery:  fakeQuery,
-		bidService: bidService,
+		fakeLive:      fakeLive,
+		fakeStatus:    fakeStatus,
+		fakeQuery:     fakeQuery,
+		bidService:    bidService,
+		assetsService: assetsService,
 	}
 }
 
@@ -329,4 +345,90 @@ func TestIntegration_PostFiltering(t *testing.T) {
 	assert.Equal(t, "valid", result[0].Transactions[0].Hash)
 	assert.Equal(t, int64(42), result[0].Transactions[0].Bid.Price)
 	assert.Equal(t, uint16(1), result[0].Transactions[0].Bid.Quantity)
+}
+
+func TestIntegration_GetAssetsForIdentities_EndToEnd(t *testing.T) {
+	env := newTestEnv(t)
+	ctx := context.Background()
+
+	id1 := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	id2 := "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+
+	// id1 holds CFB both owned and possessed, and QFT owned only.
+	env.fakeLive.ownedAssets[id1] = []*protobuff.OwnedAsset{
+		{
+			Data: &protobuff.OwnedAssetData{
+				OwnerIdentity:         id1,
+				ManagingContractIndex: 1,
+				NumberOfUnits:         1000,
+				IssuedAsset:           &protobuff.IssuedAssetData{Name: "CFB", IssuerIdentity: "CFBM"},
+			},
+			Info: &protobuff.AssetInfo{Tick: 100},
+		},
+		{
+			Data: &protobuff.OwnedAssetData{
+				OwnerIdentity:         id1,
+				ManagingContractIndex: 1,
+				NumberOfUnits:         50,
+				IssuedAsset:           &protobuff.IssuedAssetData{Name: "QFT", IssuerIdentity: "TFUY"},
+			},
+			Info: &protobuff.AssetInfo{Tick: 100},
+		},
+	}
+	env.fakeLive.possessedAssets[id1] = []*protobuff.PossessedAsset{
+		{
+			Data: &protobuff.PossessedAssetData{
+				PossessorIdentity:     id1,
+				ManagingContractIndex: 1,
+				NumberOfUnits:         1000,
+				OwnedAsset: &protobuff.OwnedAssetData{
+					IssuedAsset: &protobuff.IssuedAssetData{Name: "CFB", IssuerIdentity: "CFBM"},
+				},
+			},
+			Info: &protobuff.AssetInfo{Tick: 101},
+		},
+	}
+
+	// id2 holds RANDOM possessed only (SC share, issuer = AAAA...).
+	env.fakeLive.possessedAssets[id2] = []*protobuff.PossessedAsset{
+		{
+			Data: &protobuff.PossessedAssetData{
+				PossessorIdentity:     id2,
+				ManagingContractIndex: 1,
+				NumberOfUnits:         10,
+				OwnedAsset: &protobuff.OwnedAssetData{
+					IssuedAsset: &protobuff.IssuedAssetData{Name: "RANDOM", IssuerIdentity: "AAAA"},
+				},
+			},
+			Info: &protobuff.AssetInfo{Tick: 102},
+		},
+	}
+
+	result, err := env.assetsService.GetAssetsForIdentities(ctx, []string{id1, id2})
+	require.NoError(t, err)
+	require.Len(t, result, 3)
+
+	byKey := map[string]domain.AssetBalance{}
+	for _, b := range result {
+		byKey[b.PublicId+"|"+b.AssetName] = b
+	}
+
+	cfb := byKey[id1+"|CFB"]
+	assert.Equal(t, int64(1000), cfb.OwnedAmount)
+	assert.Equal(t, int64(1000), cfb.PossessedAmount)
+	assert.Equal(t, uint32(100), cfb.OwnedValidForTick)
+	assert.Equal(t, uint32(101), cfb.PossessedValidForTick)
+	assert.Equal(t, "CFBM", cfb.IssuerIdentity)
+
+	qft := byKey[id1+"|QFT"]
+	assert.Equal(t, int64(50), qft.OwnedAmount)
+	assert.Equal(t, int64(0), qft.PossessedAmount)
+	assert.Equal(t, uint32(100), qft.OwnedValidForTick)
+	assert.Equal(t, uint32(0), qft.PossessedValidForTick)
+
+	random := byKey[id2+"|RANDOM"]
+	assert.Equal(t, int64(0), random.OwnedAmount)
+	assert.Equal(t, int64(10), random.PossessedAmount)
+	assert.Equal(t, uint32(0), random.OwnedValidForTick)
+	assert.Equal(t, uint32(102), random.PossessedValidForTick)
 }

@@ -29,6 +29,26 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetCurrentIpoBidsResponse'
+    /getIdentitiesAssets:
+        post:
+            tags:
+                - AggregationGeneralService
+            summary: Get asset balances for a list of identities.
+            description: Allows for requesting the owned and possessed asset balances (tokens and smart contract shares) for a number of Qubic wallet identities.
+            operationId: AggregationGeneralService_GetIdentitiesAssets
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetIdentitiesAssetsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetIdentitiesAssetsResponse'
     /getIdentitiesBalances:
         post:
             tags:
@@ -51,6 +71,28 @@ paths:
                                 $ref: '#/components/schemas/GetIdentitiesBalancesResponse'
 components:
     schemas:
+        AssetBalance:
+            type: object
+            properties:
+                publicId:
+                    type: string
+                assetName:
+                    type: string
+                issuerIdentity:
+                    type: string
+                contractIndex:
+                    type: integer
+                    format: uint32
+                ownedAmount:
+                    type: string
+                possessedAmount:
+                    type: string
+                ownedValidForTick:
+                    type: integer
+                    format: uint32
+                possessedValidForTick:
+                    type: integer
+                    format: uint32
         BidTransaction:
             type: object
             properties:
@@ -95,6 +137,20 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/IpoBidTransactions'
+        GetIdentitiesAssetsRequest:
+            type: object
+            properties:
+                identities:
+                    type: array
+                    items:
+                        type: string
+        GetIdentitiesAssetsResponse:
+            type: object
+            properties:
+                assets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetBalance'
         GetIdentitiesBalancesRequest:
             type: object
             properties:

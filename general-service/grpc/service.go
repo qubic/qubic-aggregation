@@ -15,13 +15,15 @@ type Service struct {
 	logger          *zap.SugaredLogger
 	bidsService     domain.BidServicer
 	balancesService domain.BalancesServicer
+	assetsService   domain.AssetsServicer
 }
 
-func NewService(logger *zap.SugaredLogger, bidService domain.BidServicer, balancesService domain.BalancesServicer) *Service {
+func NewService(logger *zap.SugaredLogger, bidService domain.BidServicer, balancesService domain.BalancesServicer, assetsService domain.AssetsServicer) *Service {
 	return &Service{
 		logger:          logger,
 		bidsService:     bidService,
 		balancesService: balancesService,
+		assetsService:   assetsService,
 	}
 }
 
@@ -104,4 +106,35 @@ func (s *Service) GetIdentitiesBalances(ctx context.Context, req *pb.GetIdentiti
 	}
 
 	return &pb.GetIdentitiesBalancesResponse{Balances: balances}, nil
+}
+
+func (s *Service) GetIdentitiesAssets(ctx context.Context, req *pb.GetIdentitiesAssetsRequest) (*pb.GetIdentitiesAssetsResponse, error) {
+	if len(req.Identities) > 15 {
+		return nil, status.Errorf(codes.InvalidArgument, "maximum 15 identities are allowed per query. got: %d", len(req.Identities))
+	}
+
+	if len(req.Identities) < 1 {
+		return nil, status.Errorf(codes.InvalidArgument, "at least one identity required for this request. got %d", len(req.Identities))
+	}
+
+	identitiesAssets, err := s.assetsService.GetAssetsForIdentities(ctx, req.Identities)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "getting identities assets: %v", err)
+	}
+
+	var assets []*pb.AssetBalance
+	for _, asset := range identitiesAssets {
+		assets = append(assets, &pb.AssetBalance{
+			PublicId:              asset.PublicId,
+			AssetName:             asset.AssetName,
+			IssuerIdentity:        asset.IssuerIdentity,
+			ContractIndex:         asset.ContractIndex,
+			OwnedAmount:           asset.OwnedAmount,
+			PossessedAmount:       asset.PossessedAmount,
+			OwnedValidForTick:     asset.OwnedValidForTick,
+			PossessedValidForTick: asset.PossessedValidForTick,
+		})
+	}
+
+	return &pb.GetIdentitiesAssetsResponse{Assets: assets}, nil
 }

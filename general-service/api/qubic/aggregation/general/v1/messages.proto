@@ -58,3 +58,22 @@ message GetIdentitiesBalancesRequest {
 message GetIdentitiesBalancesResponse {
   repeated IdentityBalance balances = 1;
 }
+
+message AssetBalance {
+  string public_id = 1;
+  string asset_name = 2;
+  string issuer_identity = 3;
+  uint32 contract_index = 4;
+  int64 owned_amount = 5;
+  int64 possessed_amount = 6;
+  uint32 owned_valid_for_tick = 7;
+  uint32 possessed_valid_for_tick = 8;
+}
+
+message GetIdentitiesAssetsRequest {
+  repeated string identities = 1;
+}
+
+message GetIdentitiesAssetsResponse {
+  repeated AssetBalance assets = 1;
+}

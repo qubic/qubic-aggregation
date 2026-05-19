@@ -1,6 +1,6 @@
 package domain
 
-//go:generate mockgen -destination=mocks/mock_interfaces.go -package=mocks github.com/qubic/qubic-aggregation/general-service/domain LiveService,StatusService,QueryService,BidServicer,BalancesServicer
+//go:generate mockgen -destination=mocks/mock_interfaces.go -package=mocks github.com/qubic/qubic-aggregation/general-service/domain LiveService,StatusService,QueryService,BidServicer,BalancesServicer,AssetsServicer
 
 import (
 	"context"
@@ -11,6 +11,8 @@ type LiveService interface {
 	GetContractIpoBids(ctx context.Context, contractIndex uint32) (IpoBidData, error)
 	GetTickInfo(ctx context.Context) (TickInfo, error)
 	GetBalance(ctx context.Context, identity string) (IdentityBalance, error)
+	GetOwnedAssets(ctx context.Context, identity string) ([]OwnedAsset, error)
+	GetPossessedAssets(ctx context.Context, identity string) ([]PossessedAsset, error)
 }
 
 type StatusService interface {
@@ -27,4 +29,8 @@ type BidServicer interface {
 
 type BalancesServicer interface {
 	GetBalancesForIdentities(ctx context.Context, identities []string) ([]IdentityBalance, error)
+}
+
+type AssetsServicer interface {
+	GetAssetsForIdentities(ctx context.Context, identities []string) ([]AssetBalance, error)
 }
