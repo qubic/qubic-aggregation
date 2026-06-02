@@ -26,10 +26,11 @@ var File_qubic_aggregation_general_v1_service_proto protoreflect.FileDescriptor
 
 const file_qubic_aggregation_general_v1_service_proto_rawDesc = "" +
 	"\n" +
-	"*qubic/aggregation/general/v1/service.proto\x12\x1cqubic.aggregation.general.v1\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1cgoogle/api/annotations.proto\x1a+qubic/aggregation/general/v1/messages.proto2\xc2\x05\n" +
+	"*qubic/aggregation/general/v1/service.proto\x12\x1cqubic.aggregation.general.v1\x1a$gnostic/openapi/v3/annotations.proto\x1a\x1cgoogle/api/annotations.proto\x1a+qubic/aggregation/general/v1/messages.proto2\xae\b\n" +
 	"\x19AggregationGeneralService\x12\xeb\x02\n" +
 	"\x11GetCurrentIpoBids\x126.qubic.aggregation.general.v1.GetCurrentIpoBidsRequest\x1a7.qubic.aggregation.general.v1.GetCurrentIpoBidsResponse\"\xe4\x01\xbaG\xb1\x01\x126Get bidder bid transactions for currently active IPOs.\x1awAllows for requesting the transactions associated with bids of currently active IPOs for a number of bidder identities.\x82\xd3\xe4\x93\x02):\x01*b\x10ipo_transactions\"\x12/getCurrentIpoBids\x12\xb6\x02\n" +
-	"\x15GetIdentitiesBalances\x12:.qubic.aggregation.general.v1.GetIdentitiesBalancesRequest\x1a;.qubic.aggregation.general.v1.GetIdentitiesBalancesResponse\"\xa3\x01\xbaGu\x12&Get balances for a list of identities.\x1aKAllows for requesting the balances for a number of Qubic wallet identities.\x82\xd3\xe4\x93\x02%:\x01*b\bbalances\"\x16/getIdentitiesBalancesB\xeb\x01\xbaG\xa4\x01\x12W\n" +
+	"\x15GetIdentitiesBalances\x12:.qubic.aggregation.general.v1.GetIdentitiesBalancesRequest\x1a;.qubic.aggregation.general.v1.GetIdentitiesBalancesResponse\"\xa3\x01\xbaGu\x12&Get balances for a list of identities.\x1aKAllows for requesting the balances for a number of Qubic wallet identities.\x82\xd3\xe4\x93\x02%:\x01*b\bbalances\"\x16/getIdentitiesBalances\x12\xe9\x02\n" +
+	"\x13GetIdentitiesAssets\x128.qubic.aggregation.general.v1.GetIdentitiesAssetsRequest\x1a9.qubic.aggregation.general.v1.GetIdentitiesAssetsResponse\"\xdc\x01\xbaG\xb9\x01\x12,Get asset balances for a list of identities.\x1a\x88\x01Allows for requesting the owned and possessed asset balances (tokens and smart contract shares) for a number of Qubic wallet identities.\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/getIdentitiesAssetsB\xeb\x01\xbaG\xa4\x01\x12W\n" +
 	"!Qubic General Aggregation Service\x12+General API for aggregated data / requests.2\x051.0.0\x1a\x13\n" +
 	"\x11https://TO-DEFINEB4\n" +
 	"\x06GitHub\x12*https://github.com/qubic/qubic-aggregationZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
@@ -37,16 +38,20 @@ const file_qubic_aggregation_general_v1_service_proto_rawDesc = "" +
 var file_qubic_aggregation_general_v1_service_proto_goTypes = []any{
 	(*GetCurrentIpoBidsRequest)(nil),      // 0: qubic.aggregation.general.v1.GetCurrentIpoBidsRequest
 	(*GetIdentitiesBalancesRequest)(nil),  // 1: qubic.aggregation.general.v1.GetIdentitiesBalancesRequest
-	(*GetCurrentIpoBidsResponse)(nil),     // 2: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse
-	(*GetIdentitiesBalancesResponse)(nil), // 3: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
+	(*GetIdentitiesAssetsRequest)(nil),    // 2: qubic.aggregation.general.v1.GetIdentitiesAssetsRequest
+	(*GetCurrentIpoBidsResponse)(nil),     // 3: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse
+	(*GetIdentitiesBalancesResponse)(nil), // 4: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
+	(*GetIdentitiesAssetsResponse)(nil),   // 5: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse
 }
 var file_qubic_aggregation_general_v1_service_proto_depIdxs = []int32{
 	0, // 0: qubic.aggregation.general.v1.AggregationGeneralService.GetCurrentIpoBids:input_type -> qubic.aggregation.general.v1.GetCurrentIpoBidsRequest
 	1, // 1: qubic.aggregation.general.v1.AggregationGeneralService.GetIdentitiesBalances:input_type -> qubic.aggregation.general.v1.GetIdentitiesBalancesRequest
-	2, // 2: qubic.aggregation.general.v1.AggregationGeneralService.GetCurrentIpoBids:output_type -> qubic.aggregation.general.v1.GetCurrentIpoBidsResponse
-	3, // 3: qubic.aggregation.general.v1.AggregationGeneralService.GetIdentitiesBalances:output_type -> qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	2, // 2: qubic.aggregation.general.v1.AggregationGeneralService.GetIdentitiesAssets:input_type -> qubic.aggregation.general.v1.GetIdentitiesAssetsRequest
+	3, // 3: qubic.aggregation.general.v1.AggregationGeneralService.GetCurrentIpoBids:output_type -> qubic.aggregation.general.v1.GetCurrentIpoBidsResponse
+	4, // 4: qubic.aggregation.general.v1.AggregationGeneralService.GetIdentitiesBalances:output_type -> qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
+	5, // 5: qubic.aggregation.general.v1.AggregationGeneralService.GetIdentitiesAssets:output_type -> qubic.aggregation.general.v1.GetIdentitiesAssetsResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

@@ -78,6 +78,44 @@ func (lsc *LiveServiceClient) GetTickInfo(ctx context.Context) (domain.TickInfo,
 	}, nil
 }
 
+func (lsc *LiveServiceClient) GetOwnedAssets(ctx context.Context, identity string) ([]domain.AssetOwnership, error) {
+	response, err := lsc.client.GetOwnedAssets(ctx, &protobuff.OwnedAssetsRequest{Identity: identity})
+	if err != nil {
+		return nil, fmt.Errorf("requesting owned assets from live service: %w", err)
+	}
+
+	ownerships := make([]domain.AssetOwnership, 0, len(response.OwnedAssets))
+	for _, asset := range response.OwnedAssets {
+		ownerships = append(ownerships, domain.AssetOwnership{
+			AssetIssuer:           asset.Data.IssuedAsset.IssuerIdentity,
+			AssetName:             asset.Data.IssuedAsset.Name,
+			ManagingContractIndex: asset.Data.ManagingContractIndex,
+			NumberOfShares:        asset.Data.NumberOfUnits,
+			TickNumber:            asset.Info.Tick,
+		})
+	}
+	return ownerships, nil
+}
+
+func (lsc *LiveServiceClient) GetPossessedAssets(ctx context.Context, identity string) ([]domain.AssetPossession, error) {
+	response, err := lsc.client.GetPossessedAssets(ctx, &protobuff.PossessedAssetsRequest{Identity: identity})
+	if err != nil {
+		return nil, fmt.Errorf("requesting possessed assets from live service: %w", err)
+	}
+
+	possessions := make([]domain.AssetPossession, 0, len(response.PossessedAssets))
+	for _, asset := range response.PossessedAssets {
+		possessions = append(possessions, domain.AssetPossession{
+			AssetIssuer:           asset.Data.OwnedAsset.IssuedAsset.IssuerIdentity,
+			AssetName:             asset.Data.OwnedAsset.IssuedAsset.Name,
+			ManagingContractIndex: asset.Data.ManagingContractIndex,
+			NumberOfShares:        asset.Data.NumberOfUnits,
+			TickNumber:            asset.Info.Tick,
+		})
+	}
+	return possessions, nil
+}
+
 func (lsc *LiveServiceClient) GetBalance(ctx context.Context, identity string) (domain.IdentityBalance, error) {
 	balanceResponse, err := lsc.client.GetBalance(ctx, &protobuff.GetBalanceRequest{Id: identity})
 	if err != nil {

@@ -29,6 +29,26 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetCurrentIpoBidsResponse'
+    /getIdentitiesAssets:
+        post:
+            tags:
+                - AggregationGeneralService
+            summary: Get asset balances for a list of identities.
+            description: Allows for requesting the owned and possessed asset balances (tokens and smart contract shares) for a number of Qubic wallet identities.
+            operationId: AggregationGeneralService_GetIdentitiesAssets
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetIdentitiesAssetsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetIdentitiesAssetsResponse'
     /getIdentitiesBalances:
         post:
             tags:
@@ -51,6 +71,36 @@ paths:
                                 $ref: '#/components/schemas/GetIdentitiesBalancesResponse'
 components:
     schemas:
+        AssetOwnership:
+            type: object
+            properties:
+                assetIssuer:
+                    type: string
+                assetName:
+                    type: string
+                managingContractIndex:
+                    type: integer
+                    format: uint32
+                numberOfShares:
+                    type: string
+                tickNumber:
+                    type: integer
+                    format: uint32
+        AssetPossession:
+            type: object
+            properties:
+                assetIssuer:
+                    type: string
+                assetName:
+                    type: string
+                managingContractIndex:
+                    type: integer
+                    format: uint32
+                numberOfShares:
+                    type: string
+                tickNumber:
+                    type: integer
+                    format: uint32
         BidTransaction:
             type: object
             properties:
@@ -95,6 +145,20 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/IpoBidTransactions'
+        GetIdentitiesAssetsRequest:
+            type: object
+            properties:
+                identities:
+                    type: array
+                    items:
+                        type: string
+        GetIdentitiesAssetsResponse:
+            type: object
+            properties:
+                identityAssets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/IdentityAssets'
         GetIdentitiesBalancesRequest:
             type: object
             properties:
@@ -109,6 +173,19 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/IdentityBalance'
+        IdentityAssets:
+            type: object
+            properties:
+                identity:
+                    type: string
+                ownerships:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetOwnership'
+                possessions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetPossession'
         IdentityBalance:
             type: object
             properties:
