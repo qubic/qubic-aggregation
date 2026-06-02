@@ -63,33 +63,26 @@ type IdentityBalance struct {
 	NumberOfOutgoingTransfers  uint32
 }
 
-type OwnedAsset struct {
-	PublicId       string
-	AssetName      string
-	IssuerIdentity string
-	ContractIndex  uint32
-	Amount         int64
-	Tick           uint32
-}
-
-type PossessedAsset struct {
-	PublicId       string
-	AssetName      string
-	IssuerIdentity string
-	ContractIndex  uint32
-	Amount         int64
-	Tick           uint32
-}
-
-type AssetBalance struct {
-	PublicId              string
+type AssetOwnership struct {
+	AssetIssuer           string
 	AssetName             string
-	IssuerIdentity        string
-	ContractIndex         uint32
-	OwnedAmount           int64
-	PossessedAmount       int64
-	OwnedValidForTick     uint32
-	PossessedValidForTick uint32
+	ManagingContractIndex uint32
+	NumberOfShares        int64
+	TickNumber            uint32
+}
+
+type AssetPossession struct {
+	AssetIssuer           string
+	AssetName             string
+	ManagingContractIndex uint32
+	NumberOfShares        int64
+	TickNumber            uint32
+}
+
+type IdentityAssets struct {
+	Identity    string
+	Ownerships  []AssetOwnership
+	Possessions []AssetPossession
 }
 
 func GetEpochIntervalsAbsoluteRange(epochIntervals []TickInterval) (first, last uint32) {

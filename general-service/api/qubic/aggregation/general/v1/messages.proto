@@ -59,15 +59,26 @@ message GetIdentitiesBalancesResponse {
   repeated IdentityBalance balances = 1;
 }
 
-message AssetBalance {
-  string public_id = 1;
+message AssetOwnership {
+  string asset_issuer = 1;
   string asset_name = 2;
-  string issuer_identity = 3;
-  uint32 contract_index = 4;
-  int64 owned_amount = 5;
-  int64 possessed_amount = 6;
-  uint32 owned_valid_for_tick = 7;
-  uint32 possessed_valid_for_tick = 8;
+  uint32 managing_contract_index = 3;
+  int64 number_of_shares = 4;
+  uint32 tick_number = 5;
+}
+
+message AssetPossession {
+  string asset_issuer = 1;
+  string asset_name = 2;
+  uint32 managing_contract_index = 3;
+  int64 number_of_shares = 4;
+  uint32 tick_number = 5;
+}
+
+message IdentityAssets {
+  string identity = 1;
+  repeated AssetOwnership ownerships = 2;
+  repeated AssetPossession possessions = 3;
 }
 
 message GetIdentitiesAssetsRequest {
@@ -75,5 +86,5 @@ message GetIdentitiesAssetsRequest {
 }
 
 message GetIdentitiesAssetsResponse {
-  repeated AssetBalance assets = 1;
+  repeated IdentityAssets assets = 1;
 }

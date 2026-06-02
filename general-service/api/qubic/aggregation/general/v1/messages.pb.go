@@ -557,34 +557,31 @@ func (x *GetIdentitiesBalancesResponse) GetBalances() []*IdentityBalance {
 	return nil
 }
 
-type AssetBalance struct {
+type AssetOwnership struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
-	PublicId              string                 `protobuf:"bytes,1,opt,name=public_id,json=publicId,proto3" json:"public_id,omitempty"`
+	AssetIssuer           string                 `protobuf:"bytes,1,opt,name=asset_issuer,json=assetIssuer,proto3" json:"asset_issuer,omitempty"`
 	AssetName             string                 `protobuf:"bytes,2,opt,name=asset_name,json=assetName,proto3" json:"asset_name,omitempty"`
-	IssuerIdentity        string                 `protobuf:"bytes,3,opt,name=issuer_identity,json=issuerIdentity,proto3" json:"issuer_identity,omitempty"`
-	ContractIndex         uint32                 `protobuf:"varint,4,opt,name=contract_index,json=contractIndex,proto3" json:"contract_index,omitempty"`
-	OwnedAmount           int64                  `protobuf:"varint,5,opt,name=owned_amount,json=ownedAmount,proto3" json:"owned_amount,omitempty"`
-	PossessedAmount       int64                  `protobuf:"varint,6,opt,name=possessed_amount,json=possessedAmount,proto3" json:"possessed_amount,omitempty"`
-	OwnedValidForTick     uint32                 `protobuf:"varint,7,opt,name=owned_valid_for_tick,json=ownedValidForTick,proto3" json:"owned_valid_for_tick,omitempty"`
-	PossessedValidForTick uint32                 `protobuf:"varint,8,opt,name=possessed_valid_for_tick,json=possessedValidForTick,proto3" json:"possessed_valid_for_tick,omitempty"`
+	ManagingContractIndex uint32                 `protobuf:"varint,3,opt,name=managing_contract_index,json=managingContractIndex,proto3" json:"managing_contract_index,omitempty"`
+	NumberOfShares        int64                  `protobuf:"varint,4,opt,name=number_of_shares,json=numberOfShares,proto3" json:"number_of_shares,omitempty"`
+	TickNumber            uint32                 `protobuf:"varint,5,opt,name=tick_number,json=tickNumber,proto3" json:"tick_number,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
 
-func (x *AssetBalance) Reset() {
-	*x = AssetBalance{}
+func (x *AssetOwnership) Reset() {
+	*x = AssetOwnership{}
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AssetBalance) String() string {
+func (x *AssetOwnership) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AssetBalance) ProtoMessage() {}
+func (*AssetOwnership) ProtoMessage() {}
 
-func (x *AssetBalance) ProtoReflect() protoreflect.Message {
+func (x *AssetOwnership) ProtoReflect() protoreflect.Message {
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -596,65 +593,180 @@ func (x *AssetBalance) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AssetBalance.ProtoReflect.Descriptor instead.
-func (*AssetBalance) Descriptor() ([]byte, []int) {
+// Deprecated: Use AssetOwnership.ProtoReflect.Descriptor instead.
+func (*AssetOwnership) Descriptor() ([]byte, []int) {
 	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *AssetBalance) GetPublicId() string {
+func (x *AssetOwnership) GetAssetIssuer() string {
 	if x != nil {
-		return x.PublicId
+		return x.AssetIssuer
 	}
 	return ""
 }
 
-func (x *AssetBalance) GetAssetName() string {
+func (x *AssetOwnership) GetAssetName() string {
 	if x != nil {
 		return x.AssetName
 	}
 	return ""
 }
 
-func (x *AssetBalance) GetIssuerIdentity() string {
+func (x *AssetOwnership) GetManagingContractIndex() uint32 {
 	if x != nil {
-		return x.IssuerIdentity
+		return x.ManagingContractIndex
+	}
+	return 0
+}
+
+func (x *AssetOwnership) GetNumberOfShares() int64 {
+	if x != nil {
+		return x.NumberOfShares
+	}
+	return 0
+}
+
+func (x *AssetOwnership) GetTickNumber() uint32 {
+	if x != nil {
+		return x.TickNumber
+	}
+	return 0
+}
+
+type AssetPossession struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	AssetIssuer           string                 `protobuf:"bytes,1,opt,name=asset_issuer,json=assetIssuer,proto3" json:"asset_issuer,omitempty"`
+	AssetName             string                 `protobuf:"bytes,2,opt,name=asset_name,json=assetName,proto3" json:"asset_name,omitempty"`
+	ManagingContractIndex uint32                 `protobuf:"varint,3,opt,name=managing_contract_index,json=managingContractIndex,proto3" json:"managing_contract_index,omitempty"`
+	NumberOfShares        int64                  `protobuf:"varint,4,opt,name=number_of_shares,json=numberOfShares,proto3" json:"number_of_shares,omitempty"`
+	TickNumber            uint32                 `protobuf:"varint,5,opt,name=tick_number,json=tickNumber,proto3" json:"tick_number,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *AssetPossession) Reset() {
+	*x = AssetPossession{}
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetPossession) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetPossession) ProtoMessage() {}
+
+func (x *AssetPossession) ProtoReflect() protoreflect.Message {
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetPossession.ProtoReflect.Descriptor instead.
+func (*AssetPossession) Descriptor() ([]byte, []int) {
+	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *AssetPossession) GetAssetIssuer() string {
+	if x != nil {
+		return x.AssetIssuer
 	}
 	return ""
 }
 
-func (x *AssetBalance) GetContractIndex() uint32 {
+func (x *AssetPossession) GetAssetName() string {
 	if x != nil {
-		return x.ContractIndex
+		return x.AssetName
+	}
+	return ""
+}
+
+func (x *AssetPossession) GetManagingContractIndex() uint32 {
+	if x != nil {
+		return x.ManagingContractIndex
 	}
 	return 0
 }
 
-func (x *AssetBalance) GetOwnedAmount() int64 {
+func (x *AssetPossession) GetNumberOfShares() int64 {
 	if x != nil {
-		return x.OwnedAmount
+		return x.NumberOfShares
 	}
 	return 0
 }
 
-func (x *AssetBalance) GetPossessedAmount() int64 {
+func (x *AssetPossession) GetTickNumber() uint32 {
 	if x != nil {
-		return x.PossessedAmount
+		return x.TickNumber
 	}
 	return 0
 }
 
-func (x *AssetBalance) GetOwnedValidForTick() uint32 {
-	if x != nil {
-		return x.OwnedValidForTick
-	}
-	return 0
+type IdentityAssets struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Identity      string                 `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
+	Ownerships    []*AssetOwnership      `protobuf:"bytes,2,rep,name=ownerships,proto3" json:"ownerships,omitempty"`
+	Possessions   []*AssetPossession     `protobuf:"bytes,3,rep,name=possessions,proto3" json:"possessions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AssetBalance) GetPossessedValidForTick() uint32 {
+func (x *IdentityAssets) Reset() {
+	*x = IdentityAssets{}
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdentityAssets) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdentityAssets) ProtoMessage() {}
+
+func (x *IdentityAssets) ProtoReflect() protoreflect.Message {
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
 	if x != nil {
-		return x.PossessedValidForTick
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	return 0
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdentityAssets.ProtoReflect.Descriptor instead.
+func (*IdentityAssets) Descriptor() ([]byte, []int) {
+	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *IdentityAssets) GetIdentity() string {
+	if x != nil {
+		return x.Identity
+	}
+	return ""
+}
+
+func (x *IdentityAssets) GetOwnerships() []*AssetOwnership {
+	if x != nil {
+		return x.Ownerships
+	}
+	return nil
+}
+
+func (x *IdentityAssets) GetPossessions() []*AssetPossession {
+	if x != nil {
+		return x.Possessions
+	}
+	return nil
 }
 
 type GetIdentitiesAssetsRequest struct {
@@ -666,7 +778,7 @@ type GetIdentitiesAssetsRequest struct {
 
 func (x *GetIdentitiesAssetsRequest) Reset() {
 	*x = GetIdentitiesAssetsRequest{}
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -678,7 +790,7 @@ func (x *GetIdentitiesAssetsRequest) String() string {
 func (*GetIdentitiesAssetsRequest) ProtoMessage() {}
 
 func (x *GetIdentitiesAssetsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -691,7 +803,7 @@ func (x *GetIdentitiesAssetsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetIdentitiesAssetsRequest.ProtoReflect.Descriptor instead.
 func (*GetIdentitiesAssetsRequest) Descriptor() ([]byte, []int) {
-	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{9}
+	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetIdentitiesAssetsRequest) GetIdentities() []string {
@@ -703,14 +815,14 @@ func (x *GetIdentitiesAssetsRequest) GetIdentities() []string {
 
 type GetIdentitiesAssetsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Assets        []*AssetBalance        `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
+	Assets        []*IdentityAssets      `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetIdentitiesAssetsResponse) Reset() {
 	*x = GetIdentitiesAssetsResponse{}
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -722,7 +834,7 @@ func (x *GetIdentitiesAssetsResponse) String() string {
 func (*GetIdentitiesAssetsResponse) ProtoMessage() {}
 
 func (x *GetIdentitiesAssetsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -735,10 +847,10 @@ func (x *GetIdentitiesAssetsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetIdentitiesAssetsResponse.ProtoReflect.Descriptor instead.
 func (*GetIdentitiesAssetsResponse) Descriptor() ([]byte, []int) {
-	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{10}
+	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetIdentitiesAssetsResponse) GetAssets() []*AssetBalance {
+func (x *GetIdentitiesAssetsResponse) GetAssets() []*IdentityAssets {
 	if x != nil {
 		return x.Assets
 	}
@@ -799,23 +911,35 @@ const file_qubic_aggregation_general_v1_messages_proto_rawDesc = "" +
 	"identities\x18\x01 \x03(\tR\n" +
 	"identities\"j\n" +
 	"\x1dGetIdentitiesBalancesResponse\x12I\n" +
-	"\bbalances\x18\x01 \x03(\v2-.qubic.aggregation.general.v1.IdentityBalanceR\bbalances\"\xd2\x02\n" +
-	"\fAssetBalance\x12\x1b\n" +
-	"\tpublic_id\x18\x01 \x01(\tR\bpublicId\x12\x1d\n" +
+	"\bbalances\x18\x01 \x03(\v2-.qubic.aggregation.general.v1.IdentityBalanceR\bbalances\"\xd5\x01\n" +
+	"\x0eAssetOwnership\x12!\n" +
+	"\fasset_issuer\x18\x01 \x01(\tR\vassetIssuer\x12\x1d\n" +
 	"\n" +
-	"asset_name\x18\x02 \x01(\tR\tassetName\x12'\n" +
-	"\x0fissuer_identity\x18\x03 \x01(\tR\x0eissuerIdentity\x12%\n" +
-	"\x0econtract_index\x18\x04 \x01(\rR\rcontractIndex\x12!\n" +
-	"\fowned_amount\x18\x05 \x01(\x03R\vownedAmount\x12)\n" +
-	"\x10possessed_amount\x18\x06 \x01(\x03R\x0fpossessedAmount\x12/\n" +
-	"\x14owned_valid_for_tick\x18\a \x01(\rR\x11ownedValidForTick\x127\n" +
-	"\x18possessed_valid_for_tick\x18\b \x01(\rR\x15possessedValidForTick\"<\n" +
+	"asset_name\x18\x02 \x01(\tR\tassetName\x126\n" +
+	"\x17managing_contract_index\x18\x03 \x01(\rR\x15managingContractIndex\x12(\n" +
+	"\x10number_of_shares\x18\x04 \x01(\x03R\x0enumberOfShares\x12\x1f\n" +
+	"\vtick_number\x18\x05 \x01(\rR\n" +
+	"tickNumber\"\xd6\x01\n" +
+	"\x0fAssetPossession\x12!\n" +
+	"\fasset_issuer\x18\x01 \x01(\tR\vassetIssuer\x12\x1d\n" +
+	"\n" +
+	"asset_name\x18\x02 \x01(\tR\tassetName\x126\n" +
+	"\x17managing_contract_index\x18\x03 \x01(\rR\x15managingContractIndex\x12(\n" +
+	"\x10number_of_shares\x18\x04 \x01(\x03R\x0enumberOfShares\x12\x1f\n" +
+	"\vtick_number\x18\x05 \x01(\rR\n" +
+	"tickNumber\"\xcb\x01\n" +
+	"\x0eIdentityAssets\x12\x1a\n" +
+	"\bidentity\x18\x01 \x01(\tR\bidentity\x12L\n" +
+	"\n" +
+	"ownerships\x18\x02 \x03(\v2,.qubic.aggregation.general.v1.AssetOwnershipR\n" +
+	"ownerships\x12O\n" +
+	"\vpossessions\x18\x03 \x03(\v2-.qubic.aggregation.general.v1.AssetPossessionR\vpossessions\"<\n" +
 	"\x1aGetIdentitiesAssetsRequest\x12\x1e\n" +
 	"\n" +
 	"identities\x18\x01 \x03(\tR\n" +
-	"identities\"a\n" +
-	"\x1bGetIdentitiesAssetsResponse\x12B\n" +
-	"\x06assets\x18\x01 \x03(\v2*.qubic.aggregation.general.v1.AssetBalanceR\x06assetsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
+	"identities\"c\n" +
+	"\x1bGetIdentitiesAssetsResponse\x12D\n" +
+	"\x06assets\x18\x01 \x03(\v2,.qubic.aggregation.general.v1.IdentityAssetsR\x06assetsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
 
 var (
 	file_qubic_aggregation_general_v1_messages_proto_rawDescOnce sync.Once
@@ -829,7 +953,7 @@ func file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP() []byte {
 	return file_qubic_aggregation_general_v1_messages_proto_rawDescData
 }
 
-var file_qubic_aggregation_general_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_qubic_aggregation_general_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_qubic_aggregation_general_v1_messages_proto_goTypes = []any{
 	(*IpoBid)(nil),                        // 0: qubic.aggregation.general.v1.IpoBid
 	(*BidTransaction)(nil),                // 1: qubic.aggregation.general.v1.BidTransaction
@@ -839,21 +963,25 @@ var file_qubic_aggregation_general_v1_messages_proto_goTypes = []any{
 	(*IdentityBalance)(nil),               // 5: qubic.aggregation.general.v1.IdentityBalance
 	(*GetIdentitiesBalancesRequest)(nil),  // 6: qubic.aggregation.general.v1.GetIdentitiesBalancesRequest
 	(*GetIdentitiesBalancesResponse)(nil), // 7: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
-	(*AssetBalance)(nil),                  // 8: qubic.aggregation.general.v1.AssetBalance
-	(*GetIdentitiesAssetsRequest)(nil),    // 9: qubic.aggregation.general.v1.GetIdentitiesAssetsRequest
-	(*GetIdentitiesAssetsResponse)(nil),   // 10: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse
+	(*AssetOwnership)(nil),                // 8: qubic.aggregation.general.v1.AssetOwnership
+	(*AssetPossession)(nil),               // 9: qubic.aggregation.general.v1.AssetPossession
+	(*IdentityAssets)(nil),                // 10: qubic.aggregation.general.v1.IdentityAssets
+	(*GetIdentitiesAssetsRequest)(nil),    // 11: qubic.aggregation.general.v1.GetIdentitiesAssetsRequest
+	(*GetIdentitiesAssetsResponse)(nil),   // 12: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse
 }
 var file_qubic_aggregation_general_v1_messages_proto_depIdxs = []int32{
-	0, // 0: qubic.aggregation.general.v1.BidTransaction.bid:type_name -> qubic.aggregation.general.v1.IpoBid
-	1, // 1: qubic.aggregation.general.v1.IpoBidTransactions.transactions:type_name -> qubic.aggregation.general.v1.BidTransaction
-	2, // 2: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse.ipo_transactions:type_name -> qubic.aggregation.general.v1.IpoBidTransactions
-	5, // 3: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse.balances:type_name -> qubic.aggregation.general.v1.IdentityBalance
-	8, // 4: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse.assets:type_name -> qubic.aggregation.general.v1.AssetBalance
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	0,  // 0: qubic.aggregation.general.v1.BidTransaction.bid:type_name -> qubic.aggregation.general.v1.IpoBid
+	1,  // 1: qubic.aggregation.general.v1.IpoBidTransactions.transactions:type_name -> qubic.aggregation.general.v1.BidTransaction
+	2,  // 2: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse.ipo_transactions:type_name -> qubic.aggregation.general.v1.IpoBidTransactions
+	5,  // 3: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse.balances:type_name -> qubic.aggregation.general.v1.IdentityBalance
+	8,  // 4: qubic.aggregation.general.v1.IdentityAssets.ownerships:type_name -> qubic.aggregation.general.v1.AssetOwnership
+	9,  // 5: qubic.aggregation.general.v1.IdentityAssets.possessions:type_name -> qubic.aggregation.general.v1.AssetPossession
+	10, // 6: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse.assets:type_name -> qubic.aggregation.general.v1.IdentityAssets
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_qubic_aggregation_general_v1_messages_proto_init() }
@@ -867,7 +995,7 @@ func file_qubic_aggregation_general_v1_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_qubic_aggregation_general_v1_messages_proto_rawDesc), len(file_qubic_aggregation_general_v1_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

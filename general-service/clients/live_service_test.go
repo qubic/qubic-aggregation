@@ -202,15 +202,14 @@ func TestGetOwnedAssets_Success(t *testing.T) {
 		},
 	}, nil)
 
-	assets, err := lsc.GetOwnedAssets(ctx, "OWNER")
+	ownerships, err := lsc.GetOwnedAssets(ctx, "OWNER")
 	require.NoError(t, err)
-	require.Len(t, assets, 1)
-	assert.Equal(t, "OWNER", assets[0].PublicId)
-	assert.Equal(t, "CFB", assets[0].AssetName)
-	assert.Equal(t, "CFBM", assets[0].IssuerIdentity)
-	assert.Equal(t, uint32(1), assets[0].ContractIndex)
-	assert.Equal(t, int64(1000), assets[0].Amount)
-	assert.Equal(t, uint32(100), assets[0].Tick)
+	require.Len(t, ownerships, 1)
+	assert.Equal(t, "CFB", ownerships[0].AssetName)
+	assert.Equal(t, "CFBM", ownerships[0].AssetIssuer)
+	assert.Equal(t, uint32(1), ownerships[0].ManagingContractIndex)
+	assert.Equal(t, int64(1000), ownerships[0].NumberOfShares)
+	assert.Equal(t, uint32(100), ownerships[0].TickNumber)
 }
 
 func TestGetOwnedAssets_UpstreamError(t *testing.T) {
@@ -247,15 +246,14 @@ func TestGetPossessedAssets_Success(t *testing.T) {
 		},
 	}, nil)
 
-	assets, err := lsc.GetPossessedAssets(ctx, "POSS")
+	possessions, err := lsc.GetPossessedAssets(ctx, "POSS")
 	require.NoError(t, err)
-	require.Len(t, assets, 1)
-	assert.Equal(t, "POSS", assets[0].PublicId)
-	assert.Equal(t, "QFT", assets[0].AssetName)
-	assert.Equal(t, "TFUY", assets[0].IssuerIdentity)
-	assert.Equal(t, uint32(1), assets[0].ContractIndex)
-	assert.Equal(t, int64(500), assets[0].Amount)
-	assert.Equal(t, uint32(200), assets[0].Tick)
+	require.Len(t, possessions, 1)
+	assert.Equal(t, "QFT", possessions[0].AssetName)
+	assert.Equal(t, "TFUY", possessions[0].AssetIssuer)
+	assert.Equal(t, uint32(1), possessions[0].ManagingContractIndex)
+	assert.Equal(t, int64(500), possessions[0].NumberOfShares)
+	assert.Equal(t, uint32(200), possessions[0].TickNumber)
 }
 
 func TestGetPossessedAssets_UpstreamError(t *testing.T) {

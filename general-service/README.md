@@ -1,6 +1,6 @@
 # General Service
 
-General-purpose aggregation service. Currently provides IPO bid transaction aggregation, batch identity balance lookups, and batch asset (owned + possessed) lookups.
+General-purpose aggregation service. Currently provides IPO bid transaction aggregation, batch identity balance lookups, and batch asset (ownerships + possessions) lookups.
 
 ## API
 
@@ -92,30 +92,38 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 }
 ```
 
-**Response**: flat array of asset balances, one entry per `(public_id, asset_name, issuer_identity, contract_index)`. Both owned and possessed amounts are returned in the same entry; an absent side has its amount and tick set to 0.
+**Response**: per-identity asset holdings split into separate ownership and possession lists, following the [glossary](https://github.com/qubic/qct/blob/main/docs/glossary.md) names. Ownership and possession may live under different managing contracts, so they're returned independently rather than merged.
 
 ```json
 {
   "assets": [
     {
-      "public_id": "IDENTITY_A",
-      "asset_name": "CFB",
-      "issuer_identity": "CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL",
-      "contract_index": 1,
-      "owned_amount": 1000,
-      "possessed_amount": 1000,
-      "owned_valid_for_tick": 22451873,
-      "possessed_valid_for_tick": 22451873
-    },
-    {
-      "public_id": "IDENTITY_A",
-      "asset_name": "QFT",
-      "issuer_identity": "TFUYVBXYIYBVTEMJHAJGEJOOZHJBQFVQLTBBKMEHPEVIZFXZRPEYFUWGTIWG",
-      "contract_index": 1,
-      "owned_amount": 50,
-      "possessed_amount": 0,
-      "owned_valid_for_tick": 22451873,
-      "possessed_valid_for_tick": 0
+      "identity": "IDENTITY_A",
+      "ownerships": [
+        {
+          "asset_issuer": "CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL",
+          "asset_name": "CFB",
+          "managing_contract_index": 1,
+          "number_of_shares": 1000,
+          "tick_number": 22451873
+        },
+        {
+          "asset_issuer": "TFUYVBXYIYBVTEMJHAJGEJOOZHJBQFVQLTBBKMEHPEVIZFXZRPEYFUWGTIWG",
+          "asset_name": "QFT",
+          "managing_contract_index": 1,
+          "number_of_shares": 50,
+          "tick_number": 22451873
+        }
+      ],
+      "possessions": [
+        {
+          "asset_issuer": "CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL",
+          "asset_name": "CFB",
+          "managing_contract_index": 1,
+          "number_of_shares": 1000,
+          "tick_number": 22451873
+        }
+      ]
     }
   ]
 }
@@ -140,8 +148,7 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 ### Identity Assets
 
 1. For each identity, concurrently fetches owned assets (`GetOwnedAssets`) and possessed assets (`GetPossessedAssets`) from qubic-http.
-2. Merges the two views per `(asset_name, issuer_identity, contract_index)` so a single entry carries both `owned_amount` and `possessed_amount`. Each side keeps its own `valid_for_tick`.
-3. Returns a flat array across all requested identities.
+2. Returns them as two separate per-identity lists (`ownerships`, `possessions`) — no merging. Ownership and possession can be managed by different contracts, so they're surfaced as independent rows.
 
 ## Upstream Dependencies
 

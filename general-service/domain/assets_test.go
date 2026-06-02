@@ -20,44 +20,49 @@ func newTestAssetsService(t *testing.T) (*domain.AssetsService, *mocks.MockLiveS
 	return domain.NewAssetsService(logger, live), live
 }
 
-func TestGetAssetsForIdentities_MergesOwnedAndPossessed(t *testing.T) {
+func TestGetAssetsForIdentities_OwnedAndPossessedPopulated(t *testing.T) {
 	svc, live := newTestAssetsService(t)
 	ctx := context.Background()
 
-	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.OwnedAsset{
-		{PublicId: "id1", AssetName: "CFB", IssuerIdentity: "CFBM", ContractIndex: 1, Amount: 1000, Tick: 100},
+	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.AssetOwnership{
+		{AssetName: "CFB", AssetIssuer: "CFBM", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 100},
 	}, nil)
-	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return([]domain.PossessedAsset{
-		{PublicId: "id1", AssetName: "CFB", IssuerIdentity: "CFBM", ContractIndex: 1, Amount: 1000, Tick: 101},
+	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return([]domain.AssetPossession{
+		{AssetName: "CFB", AssetIssuer: "CFBM", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 101},
 	}, nil)
 
 	result, err := svc.GetAssetsForIdentities(ctx, []string{"id1"})
 	require.NoError(t, err)
 	require.Len(t, result, 1)
-	assert.Equal(t, "id1", result[0].PublicId)
-	assert.Equal(t, "CFB", result[0].AssetName)
-	assert.Equal(t, int64(1000), result[0].OwnedAmount)
-	assert.Equal(t, int64(1000), result[0].PossessedAmount)
-	assert.Equal(t, uint32(100), result[0].OwnedValidForTick)
-	assert.Equal(t, uint32(101), result[0].PossessedValidForTick)
+
+	ia := result[0]
+	assert.Equal(t, "id1", ia.Identity)
+	require.Len(t, ia.Ownerships, 1)
+	require.Len(t, ia.Possessions, 1)
+	assert.Equal(t, "CFB", ia.Ownerships[0].AssetName)
+	assert.Equal(t, int64(1000), ia.Ownerships[0].NumberOfShares)
+	assert.Equal(t, uint32(100), ia.Ownerships[0].TickNumber)
+	assert.Equal(t, int64(1000), ia.Possessions[0].NumberOfShares)
+	assert.Equal(t, uint32(101), ia.Possessions[0].TickNumber)
 }
 
 func TestGetAssetsForIdentities_OwnedOnly(t *testing.T) {
 	svc, live := newTestAssetsService(t)
 	ctx := context.Background()
 
-	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.OwnedAsset{
-		{PublicId: "id1", AssetName: "QFT", IssuerIdentity: "TFUY", ContractIndex: 1, Amount: 50, Tick: 200},
+	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.AssetOwnership{
+		{AssetName: "QFT", AssetIssuer: "TFUY", ManagingContractIndex: 1, NumberOfShares: 50, TickNumber: 200},
 	}, nil)
 	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return(nil, nil)
 
 	result, err := svc.GetAssetsForIdentities(ctx, []string{"id1"})
 	require.NoError(t, err)
 	require.Len(t, result, 1)
-	assert.Equal(t, int64(50), result[0].OwnedAmount)
-	assert.Equal(t, int64(0), result[0].PossessedAmount)
-	assert.Equal(t, uint32(200), result[0].OwnedValidForTick)
-	assert.Equal(t, uint32(0), result[0].PossessedValidForTick)
+	assert.Equal(t, "id1", result[0].Identity)
+	require.Len(t, result[0].Ownerships, 1)
+	assert.Empty(t, result[0].Possessions)
+	assert.Equal(t, "QFT", result[0].Ownerships[0].AssetName)
+	assert.Equal(t, int64(50), result[0].Ownerships[0].NumberOfShares)
 }
 
 func TestGetAssetsForIdentities_PossessedOnly(t *testing.T) {
@@ -65,66 +70,61 @@ func TestGetAssetsForIdentities_PossessedOnly(t *testing.T) {
 	ctx := context.Background()
 
 	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return(nil, nil)
-	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return([]domain.PossessedAsset{
-		{PublicId: "id1", AssetName: "RANDOM", IssuerIdentity: "AAAA", ContractIndex: 1, Amount: 10, Tick: 300},
+	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return([]domain.AssetPossession{
+		{AssetName: "RANDOM", AssetIssuer: "AAAA", ManagingContractIndex: 1, NumberOfShares: 10, TickNumber: 300},
 	}, nil)
 
 	result, err := svc.GetAssetsForIdentities(ctx, []string{"id1"})
 	require.NoError(t, err)
 	require.Len(t, result, 1)
-	assert.Equal(t, int64(0), result[0].OwnedAmount)
-	assert.Equal(t, int64(10), result[0].PossessedAmount)
-	assert.Equal(t, uint32(0), result[0].OwnedValidForTick)
-	assert.Equal(t, uint32(300), result[0].PossessedValidForTick)
+	assert.Empty(t, result[0].Ownerships)
+	require.Len(t, result[0].Possessions, 1)
+	assert.Equal(t, "RANDOM", result[0].Possessions[0].AssetName)
+	assert.Equal(t, int64(10), result[0].Possessions[0].NumberOfShares)
+}
+
+func TestGetAssetsForIdentities_DifferentManagingContracts(t *testing.T) {
+	// Regression: an ownership and possession for the same (asset, issuer) but
+	// under different managing contracts must each appear as separate rows on
+	// their respective list. They must not be merged or have their contract
+	// index overwritten.
+	svc, live := newTestAssetsService(t)
+	ctx := context.Background()
+
+	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.AssetOwnership{
+		{AssetName: "CFB", AssetIssuer: "CFBM", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 100},
+	}, nil)
+	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return([]domain.AssetPossession{
+		{AssetName: "CFB", AssetIssuer: "CFBM", ManagingContractIndex: 2, NumberOfShares: 1000, TickNumber: 100},
+	}, nil)
+
+	result, err := svc.GetAssetsForIdentities(ctx, []string{"id1"})
+	require.NoError(t, err)
+	require.Len(t, result, 1)
+	require.Len(t, result[0].Ownerships, 1)
+	require.Len(t, result[0].Possessions, 1)
+	assert.Equal(t, uint32(1), result[0].Ownerships[0].ManagingContractIndex)
+	assert.Equal(t, uint32(2), result[0].Possessions[0].ManagingContractIndex)
 }
 
 func TestGetAssetsForIdentities_MultipleIdentitiesPreservesOrder(t *testing.T) {
 	svc, live := newTestAssetsService(t)
 	ctx := context.Background()
 
-	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.OwnedAsset{
-		{PublicId: "id1", AssetName: "CFB", IssuerIdentity: "CFBM", ContractIndex: 1, Amount: 1, Tick: 100},
+	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.AssetOwnership{
+		{AssetName: "CFB", AssetIssuer: "CFBM", ManagingContractIndex: 1, NumberOfShares: 1, TickNumber: 100},
 	}, nil)
 	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return(nil, nil)
-	live.EXPECT().GetOwnedAssets(gomock.Any(), "id2").Return([]domain.OwnedAsset{
-		{PublicId: "id2", AssetName: "QFT", IssuerIdentity: "TFUY", ContractIndex: 1, Amount: 2, Tick: 100},
+	live.EXPECT().GetOwnedAssets(gomock.Any(), "id2").Return([]domain.AssetOwnership{
+		{AssetName: "QFT", AssetIssuer: "TFUY", ManagingContractIndex: 1, NumberOfShares: 2, TickNumber: 100},
 	}, nil)
 	live.EXPECT().GetPossessedAssets(gomock.Any(), "id2").Return(nil, nil)
 
 	result, err := svc.GetAssetsForIdentities(ctx, []string{"id1", "id2"})
 	require.NoError(t, err)
 	require.Len(t, result, 2)
-	assert.Equal(t, "id1", result[0].PublicId)
-	assert.Equal(t, "id2", result[1].PublicId)
-}
-
-func TestGetAssetsForIdentities_MultipleAssetsPerIdentity(t *testing.T) {
-	svc, live := newTestAssetsService(t)
-	ctx := context.Background()
-
-	live.EXPECT().GetOwnedAssets(gomock.Any(), "id1").Return([]domain.OwnedAsset{
-		{PublicId: "id1", AssetName: "CFB", IssuerIdentity: "CFBM", ContractIndex: 1, Amount: 1000, Tick: 100},
-		{PublicId: "id1", AssetName: "QFT", IssuerIdentity: "TFUY", ContractIndex: 1, Amount: 50, Tick: 100},
-	}, nil)
-	live.EXPECT().GetPossessedAssets(gomock.Any(), "id1").Return([]domain.PossessedAsset{
-		{PublicId: "id1", AssetName: "CFB", IssuerIdentity: "CFBM", ContractIndex: 1, Amount: 1000, Tick: 100},
-		{PublicId: "id1", AssetName: "QWALLET", IssuerIdentity: "AAAA", ContractIndex: 1, Amount: 200, Tick: 100},
-	}, nil)
-
-	result, err := svc.GetAssetsForIdentities(ctx, []string{"id1"})
-	require.NoError(t, err)
-	require.Len(t, result, 3)
-
-	byName := map[string]domain.AssetBalance{}
-	for _, b := range result {
-		byName[b.AssetName] = b
-	}
-	assert.Equal(t, int64(1000), byName["CFB"].OwnedAmount)
-	assert.Equal(t, int64(1000), byName["CFB"].PossessedAmount)
-	assert.Equal(t, int64(50), byName["QFT"].OwnedAmount)
-	assert.Equal(t, int64(0), byName["QFT"].PossessedAmount)
-	assert.Equal(t, int64(0), byName["QWALLET"].OwnedAmount)
-	assert.Equal(t, int64(200), byName["QWALLET"].PossessedAmount)
+	assert.Equal(t, "id1", result[0].Identity)
+	assert.Equal(t, "id2", result[1].Identity)
 }
 
 func TestGetAssetsForIdentities_UpstreamOwnedError(t *testing.T) {

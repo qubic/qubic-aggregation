@@ -406,29 +406,38 @@ func TestIntegration_GetAssetsForIdentities_EndToEnd(t *testing.T) {
 
 	result, err := env.assetsService.GetAssetsForIdentities(ctx, []string{id1, id2})
 	require.NoError(t, err)
-	require.Len(t, result, 3)
+	require.Len(t, result, 2)
 
-	byKey := map[string]domain.AssetBalance{}
-	for _, b := range result {
-		byKey[b.PublicId+"|"+b.AssetName] = b
+	assert.Equal(t, id1, result[0].Identity)
+	require.Len(t, result[0].Ownerships, 2)
+	require.Len(t, result[0].Possessions, 1)
+
+	ownByName := map[string]domain.AssetOwnership{}
+	for _, o := range result[0].Ownerships {
+		ownByName[o.AssetName] = o
 	}
+	cfbOwn := ownByName["CFB"]
+	assert.Equal(t, "CFBM", cfbOwn.AssetIssuer)
+	assert.Equal(t, uint32(1), cfbOwn.ManagingContractIndex)
+	assert.Equal(t, int64(1000), cfbOwn.NumberOfShares)
+	assert.Equal(t, uint32(100), cfbOwn.TickNumber)
 
-	cfb := byKey[id1+"|CFB"]
-	assert.Equal(t, int64(1000), cfb.OwnedAmount)
-	assert.Equal(t, int64(1000), cfb.PossessedAmount)
-	assert.Equal(t, uint32(100), cfb.OwnedValidForTick)
-	assert.Equal(t, uint32(101), cfb.PossessedValidForTick)
-	assert.Equal(t, "CFBM", cfb.IssuerIdentity)
+	qftOwn := ownByName["QFT"]
+	assert.Equal(t, "TFUY", qftOwn.AssetIssuer)
+	assert.Equal(t, int64(50), qftOwn.NumberOfShares)
 
-	qft := byKey[id1+"|QFT"]
-	assert.Equal(t, int64(50), qft.OwnedAmount)
-	assert.Equal(t, int64(0), qft.PossessedAmount)
-	assert.Equal(t, uint32(100), qft.OwnedValidForTick)
-	assert.Equal(t, uint32(0), qft.PossessedValidForTick)
+	cfbPoss := result[0].Possessions[0]
+	assert.Equal(t, "CFB", cfbPoss.AssetName)
+	assert.Equal(t, "CFBM", cfbPoss.AssetIssuer)
+	assert.Equal(t, int64(1000), cfbPoss.NumberOfShares)
+	assert.Equal(t, uint32(101), cfbPoss.TickNumber)
 
-	random := byKey[id2+"|RANDOM"]
-	assert.Equal(t, int64(0), random.OwnedAmount)
-	assert.Equal(t, int64(10), random.PossessedAmount)
-	assert.Equal(t, uint32(0), random.OwnedValidForTick)
-	assert.Equal(t, uint32(102), random.PossessedValidForTick)
+	assert.Equal(t, id2, result[1].Identity)
+	assert.Empty(t, result[1].Ownerships)
+	require.Len(t, result[1].Possessions, 1)
+	randomPoss := result[1].Possessions[0]
+	assert.Equal(t, "RANDOM", randomPoss.AssetName)
+	assert.Equal(t, "AAAA", randomPoss.AssetIssuer)
+	assert.Equal(t, int64(10), randomPoss.NumberOfShares)
+	assert.Equal(t, uint32(102), randomPoss.TickNumber)
 }

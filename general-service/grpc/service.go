@@ -122,17 +122,32 @@ func (s *Service) GetIdentitiesAssets(ctx context.Context, req *pb.GetIdentities
 		return nil, status.Errorf(codes.Internal, "getting identities assets: %v", err)
 	}
 
-	var assets []*pb.AssetBalance
-	for _, asset := range identitiesAssets {
-		assets = append(assets, &pb.AssetBalance{
-			PublicId:              asset.PublicId,
-			AssetName:             asset.AssetName,
-			IssuerIdentity:        asset.IssuerIdentity,
-			ContractIndex:         asset.ContractIndex,
-			OwnedAmount:           asset.OwnedAmount,
-			PossessedAmount:       asset.PossessedAmount,
-			OwnedValidForTick:     asset.OwnedValidForTick,
-			PossessedValidForTick: asset.PossessedValidForTick,
+	var assets []*pb.IdentityAssets
+	for _, ia := range identitiesAssets {
+		ownerships := make([]*pb.AssetOwnership, 0, len(ia.Ownerships))
+		for _, o := range ia.Ownerships {
+			ownerships = append(ownerships, &pb.AssetOwnership{
+				AssetIssuer:           o.AssetIssuer,
+				AssetName:             o.AssetName,
+				ManagingContractIndex: o.ManagingContractIndex,
+				NumberOfShares:        o.NumberOfShares,
+				TickNumber:            o.TickNumber,
+			})
+		}
+		possessions := make([]*pb.AssetPossession, 0, len(ia.Possessions))
+		for _, p := range ia.Possessions {
+			possessions = append(possessions, &pb.AssetPossession{
+				AssetIssuer:           p.AssetIssuer,
+				AssetName:             p.AssetName,
+				ManagingContractIndex: p.ManagingContractIndex,
+				NumberOfShares:        p.NumberOfShares,
+				TickNumber:            p.TickNumber,
+			})
+		}
+		assets = append(assets, &pb.IdentityAssets{
+			Identity:    ia.Identity,
+			Ownerships:  ownerships,
+			Possessions: possessions,
 		})
 	}
 

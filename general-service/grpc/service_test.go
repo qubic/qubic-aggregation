@@ -238,16 +238,15 @@ func TestGetIdentitiesBalances_EmptyResult(t *testing.T) {
 func TestGetIdentitiesAssets_Success(t *testing.T) {
 	svc, _, _, mockAssets := newTestService(t)
 
-	mockAssets.EXPECT().GetAssetsForIdentities(gomock.Any(), []string{"id1"}).Return([]domain.AssetBalance{
+	mockAssets.EXPECT().GetAssetsForIdentities(gomock.Any(), []string{"id1"}).Return([]domain.IdentityAssets{
 		{
-			PublicId:              "id1",
-			AssetName:             "CFB",
-			IssuerIdentity:        "CFBM",
-			ContractIndex:         1,
-			OwnedAmount:           1000,
-			PossessedAmount:       1000,
-			OwnedValidForTick:     100,
-			PossessedValidForTick: 100,
+			Identity: "id1",
+			Ownerships: []domain.AssetOwnership{
+				{AssetIssuer: "CFBM", AssetName: "CFB", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 100},
+			},
+			Possessions: []domain.AssetPossession{
+				{AssetIssuer: "CFBM", AssetName: "CFB", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 101},
+			},
 		},
 	}, nil)
 
@@ -256,14 +255,16 @@ func TestGetIdentitiesAssets_Success(t *testing.T) {
 	require.Len(t, resp.Assets, 1)
 
 	a := resp.Assets[0]
-	assert.Equal(t, "id1", a.PublicId)
-	assert.Equal(t, "CFB", a.AssetName)
-	assert.Equal(t, "CFBM", a.IssuerIdentity)
-	assert.Equal(t, uint32(1), a.ContractIndex)
-	assert.Equal(t, int64(1000), a.OwnedAmount)
-	assert.Equal(t, int64(1000), a.PossessedAmount)
-	assert.Equal(t, uint32(100), a.OwnedValidForTick)
-	assert.Equal(t, uint32(100), a.PossessedValidForTick)
+	assert.Equal(t, "id1", a.Identity)
+	require.Len(t, a.Ownerships, 1)
+	require.Len(t, a.Possessions, 1)
+	assert.Equal(t, "CFBM", a.Ownerships[0].AssetIssuer)
+	assert.Equal(t, "CFB", a.Ownerships[0].AssetName)
+	assert.Equal(t, uint32(1), a.Ownerships[0].ManagingContractIndex)
+	assert.Equal(t, int64(1000), a.Ownerships[0].NumberOfShares)
+	assert.Equal(t, uint32(100), a.Ownerships[0].TickNumber)
+	assert.Equal(t, int64(1000), a.Possessions[0].NumberOfShares)
+	assert.Equal(t, uint32(101), a.Possessions[0].TickNumber)
 }
 
 func TestGetIdentitiesAssets_TooManyIdentities(t *testing.T) {

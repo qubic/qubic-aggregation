@@ -87,10 +87,10 @@ func (mr *MockLiveServiceMockRecorder) GetContractIpoBids(ctx, contractIndex any
 }
 
 // GetOwnedAssets mocks base method.
-func (m *MockLiveService) GetOwnedAssets(ctx context.Context, identity string) ([]domain.OwnedAsset, error) {
+func (m *MockLiveService) GetOwnedAssets(ctx context.Context, identity string) ([]domain.AssetOwnership, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOwnedAssets", ctx, identity)
-	ret0, _ := ret[0].([]domain.OwnedAsset)
+	ret0, _ := ret[0].([]domain.AssetOwnership)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -102,10 +102,10 @@ func (mr *MockLiveServiceMockRecorder) GetOwnedAssets(ctx, identity any) *gomock
 }
 
 // GetPossessedAssets mocks base method.
-func (m *MockLiveService) GetPossessedAssets(ctx context.Context, identity string) ([]domain.PossessedAsset, error) {
+func (m *MockLiveService) GetPossessedAssets(ctx context.Context, identity string) ([]domain.AssetPossession, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPossessedAssets", ctx, identity)
-	ret0, _ := ret[0].([]domain.PossessedAsset)
+	ret0, _ := ret[0].([]domain.AssetPossession)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -312,10 +312,10 @@ func (m *MockAssetsServicer) EXPECT() *MockAssetsServicerMockRecorder {
 }
 
 // GetAssetsForIdentities mocks base method.
-func (m *MockAssetsServicer) GetAssetsForIdentities(ctx context.Context, identities []string) ([]domain.AssetBalance, error) {
+func (m *MockAssetsServicer) GetAssetsForIdentities(ctx context.Context, identities []string) ([]domain.IdentityAssets, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAssetsForIdentities", ctx, identities)
-	ret0, _ := ret[0].([]domain.AssetBalance)
+	ret0, _ := ret[0].([]domain.IdentityAssets)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

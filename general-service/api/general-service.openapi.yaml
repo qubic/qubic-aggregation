@@ -71,26 +71,34 @@ paths:
                                 $ref: '#/components/schemas/GetIdentitiesBalancesResponse'
 components:
     schemas:
-        AssetBalance:
+        AssetOwnership:
             type: object
             properties:
-                publicId:
+                assetIssuer:
                     type: string
                 assetName:
                     type: string
-                issuerIdentity:
-                    type: string
-                contractIndex:
+                managingContractIndex:
                     type: integer
                     format: uint32
-                ownedAmount:
+                numberOfShares:
                     type: string
-                possessedAmount:
-                    type: string
-                ownedValidForTick:
+                tickNumber:
                     type: integer
                     format: uint32
-                possessedValidForTick:
+        AssetPossession:
+            type: object
+            properties:
+                assetIssuer:
+                    type: string
+                assetName:
+                    type: string
+                managingContractIndex:
+                    type: integer
+                    format: uint32
+                numberOfShares:
+                    type: string
+                tickNumber:
                     type: integer
                     format: uint32
         BidTransaction:
@@ -150,7 +158,7 @@ components:
                 assets:
                     type: array
                     items:
-                        $ref: '#/components/schemas/AssetBalance'
+                        $ref: '#/components/schemas/IdentityAssets'
         GetIdentitiesBalancesRequest:
             type: object
             properties:
@@ -165,6 +173,19 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/IdentityBalance'
+        IdentityAssets:
+            type: object
+            properties:
+                identity:
+                    type: string
+                ownerships:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetOwnership'
+                possessions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetPossession'
         IdentityBalance:
             type: object
             properties:
