@@ -66,7 +66,6 @@ service AggregationGeneralService {
     option (google.api.http) = {
       post: "/getIdentitiesAssets"
       body: "*"
-      response_body: "assets"
     };
   }
 

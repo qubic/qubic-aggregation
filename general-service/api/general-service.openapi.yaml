@@ -155,7 +155,7 @@ components:
         GetIdentitiesAssetsResponse:
             type: object
             properties:
-                assets:
+                identityAssets:
                     type: array
                     items:
                         $ref: '#/components/schemas/IdentityAssets'

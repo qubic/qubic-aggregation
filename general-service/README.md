@@ -96,7 +96,7 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 
 ```json
 {
-  "assets": [
+  "identityAssets": [
     {
       "identity": "IDENTITY_A",
       "ownerships": [

@@ -180,7 +180,7 @@ func RegisterAggregationGeneralServiceHandlerServer(ctx context.Context, mux *ru
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_AggregationGeneralService_GetIdentitiesAssets_0(annotatedContext, mux, outboundMarshaler, w, req, response_AggregationGeneralService_GetIdentitiesAssets_0{resp.(*GetIdentitiesAssetsResponse)}, mux.GetForwardResponseOptions()...)
+		forward_AggregationGeneralService_GetIdentitiesAssets_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -271,7 +271,7 @@ func RegisterAggregationGeneralServiceHandlerClient(ctx context.Context, mux *ru
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_AggregationGeneralService_GetIdentitiesAssets_0(annotatedContext, mux, outboundMarshaler, w, req, response_AggregationGeneralService_GetIdentitiesAssets_0{resp.(*GetIdentitiesAssetsResponse)}, mux.GetForwardResponseOptions()...)
+		forward_AggregationGeneralService_GetIdentitiesAssets_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	return nil
 }
@@ -292,15 +292,6 @@ type response_AggregationGeneralService_GetIdentitiesBalances_0 struct {
 func (m response_AggregationGeneralService_GetIdentitiesBalances_0) XXX_ResponseBody() interface{} {
 	response := m.GetIdentitiesBalancesResponse
 	return response.Balances
-}
-
-type response_AggregationGeneralService_GetIdentitiesAssets_0 struct {
-	*GetIdentitiesAssetsResponse
-}
-
-func (m response_AggregationGeneralService_GetIdentitiesAssets_0) XXX_ResponseBody() interface{} {
-	response := m.GetIdentitiesAssetsResponse
-	return response.Assets
 }
 
 var (

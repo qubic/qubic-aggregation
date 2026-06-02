@@ -814,10 +814,10 @@ func (x *GetIdentitiesAssetsRequest) GetIdentities() []string {
 }
 
 type GetIdentitiesAssetsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Assets        []*IdentityAssets      `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	IdentityAssets []*IdentityAssets      `protobuf:"bytes,1,rep,name=identity_assets,json=identityAssets,proto3" json:"identity_assets,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *GetIdentitiesAssetsResponse) Reset() {
@@ -850,9 +850,9 @@ func (*GetIdentitiesAssetsResponse) Descriptor() ([]byte, []int) {
 	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetIdentitiesAssetsResponse) GetAssets() []*IdentityAssets {
+func (x *GetIdentitiesAssetsResponse) GetIdentityAssets() []*IdentityAssets {
 	if x != nil {
-		return x.Assets
+		return x.IdentityAssets
 	}
 	return nil
 }
@@ -937,9 +937,9 @@ const file_qubic_aggregation_general_v1_messages_proto_rawDesc = "" +
 	"\x1aGetIdentitiesAssetsRequest\x12\x1e\n" +
 	"\n" +
 	"identities\x18\x01 \x03(\tR\n" +
-	"identities\"c\n" +
-	"\x1bGetIdentitiesAssetsResponse\x12D\n" +
-	"\x06assets\x18\x01 \x03(\v2,.qubic.aggregation.general.v1.IdentityAssetsR\x06assetsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
+	"identities\"t\n" +
+	"\x1bGetIdentitiesAssetsResponse\x12U\n" +
+	"\x0fidentity_assets\x18\x01 \x03(\v2,.qubic.aggregation.general.v1.IdentityAssetsR\x0eidentityAssetsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
 
 var (
 	file_qubic_aggregation_general_v1_messages_proto_rawDescOnce sync.Once
@@ -976,7 +976,7 @@ var file_qubic_aggregation_general_v1_messages_proto_depIdxs = []int32{
 	5,  // 3: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse.balances:type_name -> qubic.aggregation.general.v1.IdentityBalance
 	8,  // 4: qubic.aggregation.general.v1.IdentityAssets.ownerships:type_name -> qubic.aggregation.general.v1.AssetOwnership
 	9,  // 5: qubic.aggregation.general.v1.IdentityAssets.possessions:type_name -> qubic.aggregation.general.v1.AssetPossession
-	10, // 6: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse.assets:type_name -> qubic.aggregation.general.v1.IdentityAssets
+	10, // 6: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse.identity_assets:type_name -> qubic.aggregation.general.v1.IdentityAssets
 	7,  // [7:7] is the sub-list for method output_type
 	7,  // [7:7] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name

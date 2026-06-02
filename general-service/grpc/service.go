@@ -122,7 +122,7 @@ func (s *Service) GetIdentitiesAssets(ctx context.Context, req *pb.GetIdentities
 		return nil, status.Errorf(codes.Internal, "getting identities assets: %v", err)
 	}
 
-	var assets []*pb.IdentityAssets
+	var identityAssets []*pb.IdentityAssets
 	for _, ia := range identitiesAssets {
 		ownerships := make([]*pb.AssetOwnership, 0, len(ia.Ownerships))
 		for _, o := range ia.Ownerships {
@@ -144,12 +144,12 @@ func (s *Service) GetIdentitiesAssets(ctx context.Context, req *pb.GetIdentities
 				TickNumber:            p.TickNumber,
 			})
 		}
-		assets = append(assets, &pb.IdentityAssets{
+		identityAssets = append(identityAssets, &pb.IdentityAssets{
 			Identity:    ia.Identity,
 			Ownerships:  ownerships,
 			Possessions: possessions,
 		})
 	}
 
-	return &pb.GetIdentitiesAssetsResponse{Assets: assets}, nil
+	return &pb.GetIdentitiesAssetsResponse{IdentityAssets: identityAssets}, nil
 }

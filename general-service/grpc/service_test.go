@@ -252,9 +252,9 @@ func TestGetIdentitiesAssets_Success(t *testing.T) {
 
 	resp, err := svc.GetIdentitiesAssets(context.Background(), &pb.GetIdentitiesAssetsRequest{Identities: []string{"id1"}})
 	require.NoError(t, err)
-	require.Len(t, resp.Assets, 1)
+	require.Len(t, resp.IdentityAssets, 1)
 
-	a := resp.Assets[0]
+	a := resp.IdentityAssets[0]
 	assert.Equal(t, "id1", a.Identity)
 	require.Len(t, a.Ownerships, 1)
 	require.Len(t, a.Possessions, 1)
