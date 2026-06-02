@@ -192,8 +192,8 @@ make test
 # Build
 go build ./cmd/general-service
 
-# Build Docker image
-docker build -t general-service .
+# Build Docker image (run from the monorepo root so `replace ../shared` resolves)
+docker build -t general-service -f general-service/Dockerfile .
 ```
 
 ## Project Structure
