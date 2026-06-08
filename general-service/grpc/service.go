@@ -5,9 +5,9 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"github.com/qubic/go-node-connector/types"
 	"strings"
 
+	"github.com/qubic/go-node-connector/v2/types"
 	pb "github.com/qubic/qubic-aggregation/general-service/api/qubic/aggregation/general/v1"
 	"github.com/qubic/qubic-aggregation/general-service/domain"
 	"go.uber.org/zap"
@@ -17,10 +17,10 @@ import (
 
 type Service struct {
 	pb.UnimplementedAggregationGeneralServiceServer
-	logger          *zap.SugaredLogger
-	bidsService     domain.BidServicer
-	balancesService domain.BalancesServicer
-	assetsService   domain.AssetsServicer
+	logger                      *zap.SugaredLogger
+	bidsService                 domain.BidServicer
+	balancesService             domain.BalancesServicer
+	assetsService               domain.AssetsServicer
 	smartContractRewardsService domain.SmartContractRewardsServicer
 
 	pageSizeLimits PageSizeLimits
@@ -33,10 +33,10 @@ func NewService(logger *zap.SugaredLogger,
 	smartContractRewardsService domain.SmartContractRewardsServicer,
 	pageSizeLimits PageSizeLimits) *Service {
 	return &Service{
-		logger:          logger,
-		bidsService:     bidService,
-		balancesService: balancesService,
-		assetsService:   assetsService,
+		logger:                      logger,
+		bidsService:                 bidService,
+		balancesService:             balancesService,
+		assetsService:               assetsService,
 		smartContractRewardsService: smartContractRewardsService,
 		pageSizeLimits:              pageSizeLimits,
 	}

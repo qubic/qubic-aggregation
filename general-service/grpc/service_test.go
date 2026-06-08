@@ -22,7 +22,7 @@ func newTestService(t *testing.T) (
 	*generalGrpc.Service,
 	*mocks.MockBidServicer,
 	*mocks.MockBalancesServicer,
-		*mocks.MockAssetsServicer,
+	*mocks.MockAssetsServicer,
 	*mocks.MockSmartContractRewardsServicer,
 	generalGrpc.PageSizeLimits,
 ) {
@@ -33,11 +33,11 @@ func newTestService(t *testing.T) (
 	mockSCRewards := mocks.NewMockSmartContractRewardsServicer(ctrl)
 	pageSizeLimits := generalGrpc.NewPageSizeLimits(1000, 10, 10000)
 	logger := zap.NewNop().Sugar()
-	return generalGrpc.NewService(logger, mockBid, mockBalances,mockAssets, mockSCRewards, pageSizeLimits), mockBid, mockBalances, mockSCRewards, pageSizeLimits
+	return generalGrpc.NewService(logger, mockBid, mockBalances, mockAssets, mockSCRewards, pageSizeLimits), mockBid, mockBalances, mockAssets, mockSCRewards, pageSizeLimits
 }
 
 func TestGetCurrentIpoBids_Success(t *testing.T) {
-	svc, mockBid, _, _ := newTestService(t)
+	svc, mockBid, _, _, _, _ := newTestService(t)
 
 	mockBid.EXPECT().GetCurrentIPOBidTransactions(gomock.Any(), []string{"id1"}).Return([]domain.IpoBidTransactions{
 		{
@@ -90,7 +90,7 @@ func TestGetCurrentIpoBids_Success(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_TooManyIdentities(t *testing.T) {
-	svc, _, _, _, _ := newTestService(t)
+	svc, _, _, _, _, _ := newTestService(t)
 
 	identities := make([]string, 16)
 	for i := range identities {
@@ -105,7 +105,7 @@ func TestGetCurrentIpoBids_TooManyIdentities(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_Exactly15Identities(t *testing.T) {
-	svc, mockBid, _ := newTestService(t)
+	svc, mockBid, _, _, _, _ := newTestService(t)
 
 	identities := make([]string, 15)
 	for i := range identities {
@@ -120,7 +120,7 @@ func TestGetCurrentIpoBids_Exactly15Identities(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_BidServiceError(t *testing.T) {
-	svc, mockBid, _ := newTestService(t)
+	svc, mockBid, _, _, _, _ := newTestService(t)
 
 	mockBid.EXPECT().GetCurrentIPOBidTransactions(gomock.Any(), []string{"id1"}).Return(nil, fmt.Errorf("internal failure"))
 
@@ -132,7 +132,7 @@ func TestGetCurrentIpoBids_BidServiceError(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_EmptyResult(t *testing.T) {
-	svc, mockBid, _ := newTestService(t)
+	svc, mockBid, _, _, _, _ := newTestService(t)
 
 	mockBid.EXPECT().GetCurrentIPOBidTransactions(gomock.Any(), []string{"id1"}).
 		Return([]domain.IpoBidTransactions{
@@ -146,7 +146,7 @@ func TestGetCurrentIpoBids_EmptyResult(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_Success(t *testing.T) {
-	svc, _, mockBalances := newTestService(t)
+	svc, _, mockBalances, _, _, _ := newTestService(t)
 
 	mockBalances.EXPECT().GetBalancesForIdentities(gomock.Any(), []string{"id1", "id2"}).Return([]domain.IdentityBalance{
 		{
@@ -194,7 +194,7 @@ func TestGetIdentitiesBalances_Success(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_TooManyIdentities(t *testing.T) {
-	svc, _, _ := newTestService(t)
+	svc, _, _, _, _, _ := newTestService(t)
 
 	identities := make([]string, 16)
 	for i := range identities {
@@ -209,7 +209,7 @@ func TestGetIdentitiesBalances_TooManyIdentities(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_Exactly15Identities(t *testing.T) {
-	svc, _, mockBalances := newTestService(t)
+	svc, _, mockBalances, _, _, _ := newTestService(t)
 
 	identities := make([]string, 15)
 	for i := range identities {
@@ -224,7 +224,7 @@ func TestGetIdentitiesBalances_Exactly15Identities(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_ServiceError(t *testing.T) {
-	svc, _, mockBalances := newTestService(t)
+	svc, _, mockBalances, _, _, _ := newTestService(t)
 
 	mockBalances.EXPECT().GetBalancesForIdentities(gomock.Any(), []string{"id1"}).Return(nil, fmt.Errorf("upstream failure"))
 
@@ -236,7 +236,7 @@ func TestGetIdentitiesBalances_ServiceError(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_EmptyResult(t *testing.T) {
-	svc, _, mockBalances := newTestService(t)
+	svc, _, mockBalances, _, _, _ := newTestService(t)
 
 	mockBalances.EXPECT().GetBalancesForIdentities(gomock.Any(), []string{"id1"}).Return([]domain.IdentityBalance{}, nil)
 
@@ -246,7 +246,7 @@ func TestGetIdentitiesBalances_EmptyResult(t *testing.T) {
 }
 
 func TestGetIdentitiesAssets_Success(t *testing.T) {
-	svc, _, _, mockAssets := newTestService(t)
+	svc, _, _, mockAssets, _, _ := newTestService(t)
 
 	mockAssets.EXPECT().GetAssetsForIdentities(gomock.Any(), []string{"id1"}).Return([]domain.IdentityAssets{
 		{
@@ -278,7 +278,7 @@ func TestGetIdentitiesAssets_Success(t *testing.T) {
 }
 
 func TestGetIdentitiesAssets_TooManyIdentities(t *testing.T) {
-	svc, _, _, _ := newTestService(t)
+	svc, _, _, _, _, _ := newTestService(t)
 
 	identities := make([]string, 16)
 	for i := range identities {
@@ -293,7 +293,7 @@ func TestGetIdentitiesAssets_TooManyIdentities(t *testing.T) {
 }
 
 func TestGetIdentitiesAssets_EmptyIdentities(t *testing.T) {
-	svc, _, _, _ := newTestService(t)
+	svc, _, _, _, _, _ := newTestService(t)
 
 	_, err := svc.GetIdentitiesAssets(context.Background(), &pb.GetIdentitiesAssetsRequest{Identities: []string{}})
 	require.Error(t, err)
@@ -303,7 +303,7 @@ func TestGetIdentitiesAssets_EmptyIdentities(t *testing.T) {
 }
 
 func TestGetIdentitiesAssets_ServiceError(t *testing.T) {
-	svc, _, _, mockAssets := newTestService(t)
+	svc, _, _, mockAssets, _, _ := newTestService(t)
 
 	mockAssets.EXPECT().GetAssetsForIdentities(gomock.Any(), []string{"id1"}).Return(nil, fmt.Errorf("upstream failure"))
 
@@ -315,7 +315,7 @@ func TestGetIdentitiesAssets_ServiceError(t *testing.T) {
 }
 
 func TestGetSmartContractRewards_Success(t *testing.T) {
-	svc, _, _, mockSCRewards, _ := newTestService(t)
+	svc, _, _, _, mockSCRewards, _ := newTestService(t)
 
 	mockSCRewards.EXPECT().GetRewardsDistributionsForSmartContract(
 		gomock.Any(),
@@ -402,7 +402,7 @@ func TestGetSmartContractRewards_BadSmartContractAddress(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			svc, _, _, _, _ := newTestService(t)
+			svc, _, _, _, _, _ := newTestService(t)
 
 			// Validation fails before the rewards service is touched, so no mock expectation is set.
 			_, err := svc.GetSmartContractRewards(context.Background(), &pb.GetSmartContractRewardsRequest{
@@ -418,7 +418,7 @@ func TestGetSmartContractRewards_BadSmartContractAddress(t *testing.T) {
 }
 
 func TestGetSmartContractRewards_InvalidPagination(t *testing.T) {
-	svc, _, _, _, _ := newTestService(t)
+	svc, _, _, _, _, _ := newTestService(t)
 
 	// Size exceeds the configured maxPageSize (1000) -> validation error before the service is called.
 	_, err := svc.GetSmartContractRewards(context.Background(), &pb.GetSmartContractRewardsRequest{
@@ -432,7 +432,7 @@ func TestGetSmartContractRewards_InvalidPagination(t *testing.T) {
 }
 
 func TestGetSmartContractRewards_NilPaginationUsesDefaults(t *testing.T) {
-	svc, _, _, mockSCRewards, _ := newTestService(t)
+	svc, _, _, _, mockSCRewards, _ := newTestService(t)
 
 	// nil pagination must not panic and must fall back to offset 0 / default size 10,
 	// and those validated defaults must be what the service is called with.
@@ -452,7 +452,7 @@ func TestGetSmartContractRewards_NilPaginationUsesDefaults(t *testing.T) {
 }
 
 func TestGetSmartContractRewards_ServiceError(t *testing.T) {
-	svc, _, _, mockSCRewards, _ := newTestService(t)
+	svc, _, _, _, mockSCRewards, _ := newTestService(t)
 
 	mockSCRewards.EXPECT().GetRewardsDistributionsForSmartContract(
 		gomock.Any(), validContractAddress, domain.Pagination{Offset: 0, Size: 10},
@@ -469,7 +469,7 @@ func TestGetSmartContractRewards_ServiceError(t *testing.T) {
 }
 
 func TestGetSmartContractRewards_EmptyResult(t *testing.T) {
-	svc, _, _, mockSCRewards, _ := newTestService(t)
+	svc, _, _, _, mockSCRewards, _ := newTestService(t)
 
 	mockSCRewards.EXPECT().GetRewardsDistributionsForSmartContract(
 		gomock.Any(), validContractAddress, domain.Pagination{Offset: 0, Size: 10},

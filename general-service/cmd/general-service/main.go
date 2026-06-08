@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/elastic/go-elasticsearch/v8"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/elastic/go-elasticsearch/v8"
 
 	"github.com/ardanlabs/conf/v3"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -114,7 +115,7 @@ func run(logger *zap.SugaredLogger) error {
 	smartContractRewardsService := domain.NewSmartContractRewardsService(logger.Named("smart-contract-rewards-service"), elasticClient)
 
 	pageSizeLimits := grpc.NewPageSizeLimits(cfg.Pagination.MaxPageSize, cfg.Pagination.DefaultPageSize, cfg.Pagination.MaxHits)
-	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService,assetsService smartContractRewardsService, pageSizeLimits)
+	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService, assetsService, smartContractRewardsService, pageSizeLimits)
 
 	errChan := make(chan error, 1)
 
