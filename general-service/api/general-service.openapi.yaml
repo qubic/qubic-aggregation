@@ -49,6 +49,26 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetIdentitiesBalancesResponse'
+    /getSmartContractRewards:
+        post:
+            tags:
+                - AggregationGeneralService
+            summary: Get SC rewards / dividends distributions for a specific smart contract.
+            description: Allows for requesting the distribution of SC rewards across ticks.
+            operationId: AggregationGeneralService_GetSmartContractRewards
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetSmartContractRewardsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetSmartContractRewardsResponse'
 components:
     schemas:
         BidTransaction:
@@ -109,6 +129,38 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/IdentityBalance'
+        GetSmartContractRewardsRequest:
+            type: object
+            properties:
+                smartContractAddress:
+                    type: string
+                pagination:
+                    $ref: '#/components/schemas/Pagination'
+        GetSmartContractRewardsResponse:
+            type: object
+            properties:
+                hits:
+                    $ref: '#/components/schemas/Hits'
+                smartContractAddress:
+                    type: string
+                totalAllTimeDistributed:
+                    type: string
+                distributions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SmartContractRewardsDistribution'
+        Hits:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: uint32
+                from:
+                    type: integer
+                    format: uint32
+                size:
+                    type: integer
+                    format: uint32
         IdentityBalance:
             type: object
             properties:
@@ -157,6 +209,34 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/BidTransaction'
+        Pagination:
+            type: object
+            properties:
+                offset:
+                    type: integer
+                    format: uint32
+                size:
+                    type: integer
+                    format: uint32
+        SmartContractRewardsDistribution:
+            type: object
+            properties:
+                totalAmount:
+                    type: string
+                transferCount:
+                    type: integer
+                    format: uint32
+                amountPerShare:
+                    type: number
+                    format: double
+                tickNumber:
+                    type: integer
+                    format: uint32
+                timestamp:
+                    type: string
+                epoch:
+                    type: integer
+                    format: uint32
 tags:
     - name: AggregationGeneralService
 externalDocs:

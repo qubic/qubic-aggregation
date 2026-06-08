@@ -63,6 +63,26 @@ type IdentityBalance struct {
 	NumberOfOutgoingTransfers  uint32
 }
 
+type Pagination struct {
+	Offset uint32
+	Size   uint32
+}
+
+type SmartContractRewardsDistribution struct {
+	TotalAmount    int64
+	TransferCount  uint32
+	AmountPerShare float64
+	TickNumber     uint32
+	Timestamp      int64
+	Epoch          uint32
+}
+
+type SmartContractRewardsDistributionsResult struct {
+	TotalHits               uint32
+	TotalAllTimeDistributed int64
+	Distributions           []SmartContractRewardsDistribution
+}
+
 func GetEpochIntervalsAbsoluteRange(epochIntervals []TickInterval) (first, last uint32) {
 	for _, interval := range epochIntervals {
 		if interval.First < first || first == 0 {

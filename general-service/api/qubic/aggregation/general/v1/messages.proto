@@ -58,3 +58,35 @@ message GetIdentitiesBalancesRequest {
 message GetIdentitiesBalancesResponse {
   repeated IdentityBalance balances = 1;
 }
+
+message Pagination {
+  uint32 offset = 1;
+  uint32 size = 2;
+}
+
+message Hits {
+  uint32 total = 1;
+  uint32 from = 2;
+  uint32 size = 3;
+}
+
+message SmartContractRewardsDistribution {
+  int64 total_amount = 1;
+  uint32 transfer_count = 2;
+  double amount_per_share = 3;
+  uint32 tick_number = 4;
+  int64 timestamp = 5;
+  uint32 epoch = 6;
+}
+
+message GetSmartContractRewardsRequest {
+  string smart_contract_address = 1;
+  Pagination pagination = 2;
+}
+
+message GetSmartContractRewardsResponse {
+  Hits hits = 1;
+  string smart_contract_address = 2;
+  int64 total_all_time_distributed = 3;
+  repeated SmartContractRewardsDistribution distributions = 4;
+}

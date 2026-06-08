@@ -1,6 +1,6 @@
 package domain
 
-//go:generate mockgen -destination=mocks/mock_interfaces.go -package=mocks github.com/qubic/qubic-aggregation/general-service/domain LiveService,StatusService,QueryService,BidServicer,BalancesServicer
+//go:generate mockgen -destination=mocks/mock_interfaces.go -package=mocks github.com/qubic/qubic-aggregation/general-service/domain LiveService,StatusService,QueryService,ElasticService,BidServicer,BalancesServicer,SmartContractRewardsServicer
 
 import (
 	"context"
@@ -21,10 +21,18 @@ type QueryService interface {
 	GetIPOBidTransactionsForIdentity(ctx context.Context, identity string, destination string, tickInterval TickInterval) ([]BidTransaction, error)
 }
 
+type ElasticService interface {
+	GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination Pagination) (*SmartContractRewardsDistributionsResult, error)
+}
+
 type BidServicer interface {
 	GetCurrentIPOBidTransactions(ctx context.Context, identities []string) ([]IpoBidTransactions, error)
 }
 
 type BalancesServicer interface {
 	GetBalancesForIdentities(ctx context.Context, identities []string) ([]IdentityBalance, error)
+}
+
+type SmartContractRewardsServicer interface {
+	GetRewardsDistributionsForSmartContract(ctx context.Context, identity string, pagination Pagination) (SmartContractRewardsDistributionsResult, error)
 }
