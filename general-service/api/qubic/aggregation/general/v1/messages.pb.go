@@ -557,28 +557,31 @@ func (x *GetIdentitiesBalancesResponse) GetBalances() []*IdentityBalance {
 	return nil
 }
 
-type Pagination struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Offset        uint32                 `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Size          uint32                 `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type AssetOwnership struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	AssetIssuer           string                 `protobuf:"bytes,1,opt,name=asset_issuer,json=assetIssuer,proto3" json:"asset_issuer,omitempty"`
+	AssetName             string                 `protobuf:"bytes,2,opt,name=asset_name,json=assetName,proto3" json:"asset_name,omitempty"`
+	ManagingContractIndex uint32                 `protobuf:"varint,3,opt,name=managing_contract_index,json=managingContractIndex,proto3" json:"managing_contract_index,omitempty"`
+	NumberOfShares        int64                  `protobuf:"varint,4,opt,name=number_of_shares,json=numberOfShares,proto3" json:"number_of_shares,omitempty"`
+	TickNumber            uint32                 `protobuf:"varint,5,opt,name=tick_number,json=tickNumber,proto3" json:"tick_number,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
-func (x *Pagination) Reset() {
-	*x = Pagination{}
+func (x *AssetOwnership) Reset() {
+	*x = AssetOwnership{}
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *Pagination) String() string {
+func (x *AssetOwnership) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Pagination) ProtoMessage() {}
+func (*AssetOwnership) ProtoMessage() {}
 
-func (x *Pagination) ProtoReflect() protoreflect.Message {
+func (x *AssetOwnership) ProtoReflect() protoreflect.Message {
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -590,191 +593,203 @@ func (x *Pagination) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Pagination.ProtoReflect.Descriptor instead.
-func (*Pagination) Descriptor() ([]byte, []int) {
+// Deprecated: Use AssetOwnership.ProtoReflect.Descriptor instead.
+func (*AssetOwnership) Descriptor() ([]byte, []int) {
 	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *Pagination) GetOffset() uint32 {
+func (x *AssetOwnership) GetAssetIssuer() string {
 	if x != nil {
-		return x.Offset
+		return x.AssetIssuer
+	}
+	return ""
+}
+
+func (x *AssetOwnership) GetAssetName() string {
+	if x != nil {
+		return x.AssetName
+	}
+	return ""
+}
+
+func (x *AssetOwnership) GetManagingContractIndex() uint32 {
+	if x != nil {
+		return x.ManagingContractIndex
 	}
 	return 0
 }
 
-func (x *Pagination) GetSize() uint32 {
+func (x *AssetOwnership) GetNumberOfShares() int64 {
 	if x != nil {
-		return x.Size
+		return x.NumberOfShares
 	}
 	return 0
 }
 
-type Hits struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Total         uint32                 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	From          uint32                 `protobuf:"varint,2,opt,name=from,proto3" json:"from,omitempty"`
-	Size          uint32                 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Hits) Reset() {
-	*x = Hits{}
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Hits) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Hits) ProtoMessage() {}
-
-func (x *Hits) ProtoReflect() protoreflect.Message {
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Hits.ProtoReflect.Descriptor instead.
-func (*Hits) Descriptor() ([]byte, []int) {
-	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *Hits) GetTotal() uint32 {
-	if x != nil {
-		return x.Total
-	}
-	return 0
-}
-
-func (x *Hits) GetFrom() uint32 {
-	if x != nil {
-		return x.From
-	}
-	return 0
-}
-
-func (x *Hits) GetSize() uint32 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-type SmartContractRewardsDistribution struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	TotalAmount    int64                  `protobuf:"varint,1,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	TransferCount  uint32                 `protobuf:"varint,2,opt,name=transfer_count,json=transferCount,proto3" json:"transfer_count,omitempty"`
-	AmountPerShare float64                `protobuf:"fixed64,3,opt,name=amount_per_share,json=amountPerShare,proto3" json:"amount_per_share,omitempty"`
-	TickNumber     uint32                 `protobuf:"varint,4,opt,name=tick_number,json=tickNumber,proto3" json:"tick_number,omitempty"`
-	Timestamp      int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Epoch          uint32                 `protobuf:"varint,6,opt,name=epoch,proto3" json:"epoch,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *SmartContractRewardsDistribution) Reset() {
-	*x = SmartContractRewardsDistribution{}
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SmartContractRewardsDistribution) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SmartContractRewardsDistribution) ProtoMessage() {}
-
-func (x *SmartContractRewardsDistribution) ProtoReflect() protoreflect.Message {
-	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SmartContractRewardsDistribution.ProtoReflect.Descriptor instead.
-func (*SmartContractRewardsDistribution) Descriptor() ([]byte, []int) {
-	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *SmartContractRewardsDistribution) GetTotalAmount() int64 {
-	if x != nil {
-		return x.TotalAmount
-	}
-	return 0
-}
-
-func (x *SmartContractRewardsDistribution) GetTransferCount() uint32 {
-	if x != nil {
-		return x.TransferCount
-	}
-	return 0
-}
-
-func (x *SmartContractRewardsDistribution) GetAmountPerShare() float64 {
-	if x != nil {
-		return x.AmountPerShare
-	}
-	return 0
-}
-
-func (x *SmartContractRewardsDistribution) GetTickNumber() uint32 {
+func (x *AssetOwnership) GetTickNumber() uint32 {
 	if x != nil {
 		return x.TickNumber
 	}
 	return 0
 }
 
-func (x *SmartContractRewardsDistribution) GetTimestamp() int64 {
+type AssetPossession struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	AssetIssuer           string                 `protobuf:"bytes,1,opt,name=asset_issuer,json=assetIssuer,proto3" json:"asset_issuer,omitempty"`
+	AssetName             string                 `protobuf:"bytes,2,opt,name=asset_name,json=assetName,proto3" json:"asset_name,omitempty"`
+	ManagingContractIndex uint32                 `protobuf:"varint,3,opt,name=managing_contract_index,json=managingContractIndex,proto3" json:"managing_contract_index,omitempty"`
+	NumberOfShares        int64                  `protobuf:"varint,4,opt,name=number_of_shares,json=numberOfShares,proto3" json:"number_of_shares,omitempty"`
+	TickNumber            uint32                 `protobuf:"varint,5,opt,name=tick_number,json=tickNumber,proto3" json:"tick_number,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *AssetPossession) Reset() {
+	*x = AssetPossession{}
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetPossession) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetPossession) ProtoMessage() {}
+
+func (x *AssetPossession) ProtoReflect() protoreflect.Message {
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[9]
 	if x != nil {
-		return x.Timestamp
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetPossession.ProtoReflect.Descriptor instead.
+func (*AssetPossession) Descriptor() ([]byte, []int) {
+	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *AssetPossession) GetAssetIssuer() string {
+	if x != nil {
+		return x.AssetIssuer
+	}
+	return ""
+}
+
+func (x *AssetPossession) GetAssetName() string {
+	if x != nil {
+		return x.AssetName
+	}
+	return ""
+}
+
+func (x *AssetPossession) GetManagingContractIndex() uint32 {
+	if x != nil {
+		return x.ManagingContractIndex
 	}
 	return 0
 }
 
-func (x *SmartContractRewardsDistribution) GetEpoch() uint32 {
+func (x *AssetPossession) GetNumberOfShares() int64 {
 	if x != nil {
-		return x.Epoch
+		return x.NumberOfShares
 	}
 	return 0
 }
 
-type GetSmartContractRewardsRequest struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	SmartContractAddress string                 `protobuf:"bytes,1,opt,name=smart_contract_address,json=smartContractAddress,proto3" json:"smart_contract_address,omitempty"`
-	Pagination           *Pagination            `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+func (x *AssetPossession) GetTickNumber() uint32 {
+	if x != nil {
+		return x.TickNumber
+	}
+	return 0
 }
 
-func (x *GetSmartContractRewardsRequest) Reset() {
-	*x = GetSmartContractRewardsRequest{}
+type IdentityAssets struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Identity      string                 `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
+	Ownerships    []*AssetOwnership      `protobuf:"bytes,2,rep,name=ownerships,proto3" json:"ownerships,omitempty"`
+	Possessions   []*AssetPossession     `protobuf:"bytes,3,rep,name=possessions,proto3" json:"possessions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IdentityAssets) Reset() {
+	*x = IdentityAssets{}
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IdentityAssets) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IdentityAssets) ProtoMessage() {}
+
+func (x *IdentityAssets) ProtoReflect() protoreflect.Message {
+	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IdentityAssets.ProtoReflect.Descriptor instead.
+func (*IdentityAssets) Descriptor() ([]byte, []int) {
+	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *IdentityAssets) GetIdentity() string {
+	if x != nil {
+		return x.Identity
+	}
+	return ""
+}
+
+func (x *IdentityAssets) GetOwnerships() []*AssetOwnership {
+	if x != nil {
+		return x.Ownerships
+	}
+	return nil
+}
+
+func (x *IdentityAssets) GetPossessions() []*AssetPossession {
+	if x != nil {
+		return x.Possessions
+	}
+	return nil
+}
+
+type GetIdentitiesAssetsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Identities    []string               `protobuf:"bytes,1,rep,name=identities,proto3" json:"identities,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetIdentitiesAssetsRequest) Reset() {
+	*x = GetIdentitiesAssetsRequest{}
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetSmartContractRewardsRequest) String() string {
+func (x *GetIdentitiesAssetsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSmartContractRewardsRequest) ProtoMessage() {}
+func (*GetIdentitiesAssetsRequest) ProtoMessage() {}
 
-func (x *GetSmartContractRewardsRequest) ProtoReflect() protoreflect.Message {
+func (x *GetIdentitiesAssetsRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -786,49 +801,39 @@ func (x *GetSmartContractRewardsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSmartContractRewardsRequest.ProtoReflect.Descriptor instead.
-func (*GetSmartContractRewardsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetIdentitiesAssetsRequest.ProtoReflect.Descriptor instead.
+func (*GetIdentitiesAssetsRequest) Descriptor() ([]byte, []int) {
 	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetSmartContractRewardsRequest) GetSmartContractAddress() string {
+func (x *GetIdentitiesAssetsRequest) GetIdentities() []string {
 	if x != nil {
-		return x.SmartContractAddress
-	}
-	return ""
-}
-
-func (x *GetSmartContractRewardsRequest) GetPagination() *Pagination {
-	if x != nil {
-		return x.Pagination
+		return x.Identities
 	}
 	return nil
 }
 
-type GetSmartContractRewardsResponse struct {
-	state                   protoimpl.MessageState              `protogen:"open.v1"`
-	Hits                    *Hits                               `protobuf:"bytes,1,opt,name=hits,proto3" json:"hits,omitempty"`
-	SmartContractAddress    string                              `protobuf:"bytes,2,opt,name=smart_contract_address,json=smartContractAddress,proto3" json:"smart_contract_address,omitempty"`
-	TotalAllTimeDistributed int64                               `protobuf:"varint,3,opt,name=total_all_time_distributed,json=totalAllTimeDistributed,proto3" json:"total_all_time_distributed,omitempty"`
-	Distributions           []*SmartContractRewardsDistribution `protobuf:"bytes,4,rep,name=distributions,proto3" json:"distributions,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+type GetIdentitiesAssetsResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	IdentityAssets []*IdentityAssets      `protobuf:"bytes,1,rep,name=identity_assets,json=identityAssets,proto3" json:"identity_assets,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-func (x *GetSmartContractRewardsResponse) Reset() {
-	*x = GetSmartContractRewardsResponse{}
+func (x *GetIdentitiesAssetsResponse) Reset() {
+	*x = GetIdentitiesAssetsResponse{}
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetSmartContractRewardsResponse) String() string {
+func (x *GetIdentitiesAssetsResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetSmartContractRewardsResponse) ProtoMessage() {}
+func (*GetIdentitiesAssetsResponse) ProtoMessage() {}
 
-func (x *GetSmartContractRewardsResponse) ProtoReflect() protoreflect.Message {
+func (x *GetIdentitiesAssetsResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_qubic_aggregation_general_v1_messages_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -840,35 +845,14 @@ func (x *GetSmartContractRewardsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetSmartContractRewardsResponse.ProtoReflect.Descriptor instead.
-func (*GetSmartContractRewardsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetIdentitiesAssetsResponse.ProtoReflect.Descriptor instead.
+func (*GetIdentitiesAssetsResponse) Descriptor() ([]byte, []int) {
 	return file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *GetSmartContractRewardsResponse) GetHits() *Hits {
+func (x *GetIdentitiesAssetsResponse) GetIdentityAssets() []*IdentityAssets {
 	if x != nil {
-		return x.Hits
-	}
-	return nil
-}
-
-func (x *GetSmartContractRewardsResponse) GetSmartContractAddress() string {
-	if x != nil {
-		return x.SmartContractAddress
-	}
-	return ""
-}
-
-func (x *GetSmartContractRewardsResponse) GetTotalAllTimeDistributed() int64 {
-	if x != nil {
-		return x.TotalAllTimeDistributed
-	}
-	return 0
-}
-
-func (x *GetSmartContractRewardsResponse) GetDistributions() []*SmartContractRewardsDistribution {
-	if x != nil {
-		return x.Distributions
+		return x.IdentityAssets
 	}
 	return nil
 }
@@ -927,33 +911,35 @@ const file_qubic_aggregation_general_v1_messages_proto_rawDesc = "" +
 	"identities\x18\x01 \x03(\tR\n" +
 	"identities\"j\n" +
 	"\x1dGetIdentitiesBalancesResponse\x12I\n" +
-	"\bbalances\x18\x01 \x03(\v2-.qubic.aggregation.general.v1.IdentityBalanceR\bbalances\"8\n" +
+	"\bbalances\x18\x01 \x03(\v2-.qubic.aggregation.general.v1.IdentityBalanceR\bbalances\"\xd5\x01\n" +
+	"\x0eAssetOwnership\x12!\n" +
+	"\fasset_issuer\x18\x01 \x01(\tR\vassetIssuer\x12\x1d\n" +
 	"\n" +
-	"Pagination\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\rR\x06offset\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\rR\x04size\"D\n" +
-	"\x04Hits\x12\x14\n" +
-	"\x05total\x18\x01 \x01(\rR\x05total\x12\x12\n" +
-	"\x04from\x18\x02 \x01(\rR\x04from\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\rR\x04size\"\xeb\x01\n" +
-	" SmartContractRewardsDistribution\x12!\n" +
-	"\ftotal_amount\x18\x01 \x01(\x03R\vtotalAmount\x12%\n" +
-	"\x0etransfer_count\x18\x02 \x01(\rR\rtransferCount\x12(\n" +
-	"\x10amount_per_share\x18\x03 \x01(\x01R\x0eamountPerShare\x12\x1f\n" +
-	"\vtick_number\x18\x04 \x01(\rR\n" +
-	"tickNumber\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12\x14\n" +
-	"\x05epoch\x18\x06 \x01(\rR\x05epoch\"\xa0\x01\n" +
-	"\x1eGetSmartContractRewardsRequest\x124\n" +
-	"\x16smart_contract_address\x18\x01 \x01(\tR\x14smartContractAddress\x12H\n" +
+	"asset_name\x18\x02 \x01(\tR\tassetName\x126\n" +
+	"\x17managing_contract_index\x18\x03 \x01(\rR\x15managingContractIndex\x12(\n" +
+	"\x10number_of_shares\x18\x04 \x01(\x03R\x0enumberOfShares\x12\x1f\n" +
+	"\vtick_number\x18\x05 \x01(\rR\n" +
+	"tickNumber\"\xd6\x01\n" +
+	"\x0fAssetPossession\x12!\n" +
+	"\fasset_issuer\x18\x01 \x01(\tR\vassetIssuer\x12\x1d\n" +
 	"\n" +
-	"pagination\x18\x02 \x01(\v2(.qubic.aggregation.general.v1.PaginationR\n" +
-	"pagination\"\xb2\x02\n" +
-	"\x1fGetSmartContractRewardsResponse\x126\n" +
-	"\x04hits\x18\x01 \x01(\v2\".qubic.aggregation.general.v1.HitsR\x04hits\x124\n" +
-	"\x16smart_contract_address\x18\x02 \x01(\tR\x14smartContractAddress\x12;\n" +
-	"\x1atotal_all_time_distributed\x18\x03 \x01(\x03R\x17totalAllTimeDistributed\x12d\n" +
-	"\rdistributions\x18\x04 \x03(\v2>.qubic.aggregation.general.v1.SmartContractRewardsDistributionR\rdistributionsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
+	"asset_name\x18\x02 \x01(\tR\tassetName\x126\n" +
+	"\x17managing_contract_index\x18\x03 \x01(\rR\x15managingContractIndex\x12(\n" +
+	"\x10number_of_shares\x18\x04 \x01(\x03R\x0enumberOfShares\x12\x1f\n" +
+	"\vtick_number\x18\x05 \x01(\rR\n" +
+	"tickNumber\"\xcb\x01\n" +
+	"\x0eIdentityAssets\x12\x1a\n" +
+	"\bidentity\x18\x01 \x01(\tR\bidentity\x12L\n" +
+	"\n" +
+	"ownerships\x18\x02 \x03(\v2,.qubic.aggregation.general.v1.AssetOwnershipR\n" +
+	"ownerships\x12O\n" +
+	"\vpossessions\x18\x03 \x03(\v2-.qubic.aggregation.general.v1.AssetPossessionR\vpossessions\"<\n" +
+	"\x1aGetIdentitiesAssetsRequest\x12\x1e\n" +
+	"\n" +
+	"identities\x18\x01 \x03(\tR\n" +
+	"identities\"t\n" +
+	"\x1bGetIdentitiesAssetsResponse\x12U\n" +
+	"\x0fidentity_assets\x18\x01 \x03(\v2,.qubic.aggregation.general.v1.IdentityAssetsR\x0eidentityAssetsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
 
 var (
 	file_qubic_aggregation_general_v1_messages_proto_rawDescOnce sync.Once
@@ -969,28 +955,28 @@ func file_qubic_aggregation_general_v1_messages_proto_rawDescGZIP() []byte {
 
 var file_qubic_aggregation_general_v1_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_qubic_aggregation_general_v1_messages_proto_goTypes = []any{
-	(*IpoBid)(nil),                           // 0: qubic.aggregation.general.v1.IpoBid
-	(*BidTransaction)(nil),                   // 1: qubic.aggregation.general.v1.BidTransaction
-	(*IpoBidTransactions)(nil),               // 2: qubic.aggregation.general.v1.IpoBidTransactions
-	(*GetCurrentIpoBidsRequest)(nil),         // 3: qubic.aggregation.general.v1.GetCurrentIpoBidsRequest
-	(*GetCurrentIpoBidsResponse)(nil),        // 4: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse
-	(*IdentityBalance)(nil),                  // 5: qubic.aggregation.general.v1.IdentityBalance
-	(*GetIdentitiesBalancesRequest)(nil),     // 6: qubic.aggregation.general.v1.GetIdentitiesBalancesRequest
-	(*GetIdentitiesBalancesResponse)(nil),    // 7: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
-	(*Pagination)(nil),                       // 8: qubic.aggregation.general.v1.Pagination
-	(*Hits)(nil),                             // 9: qubic.aggregation.general.v1.Hits
-	(*SmartContractRewardsDistribution)(nil), // 10: qubic.aggregation.general.v1.SmartContractRewardsDistribution
-	(*GetSmartContractRewardsRequest)(nil),   // 11: qubic.aggregation.general.v1.GetSmartContractRewardsRequest
-	(*GetSmartContractRewardsResponse)(nil),  // 12: qubic.aggregation.general.v1.GetSmartContractRewardsResponse
+	(*IpoBid)(nil),                        // 0: qubic.aggregation.general.v1.IpoBid
+	(*BidTransaction)(nil),                // 1: qubic.aggregation.general.v1.BidTransaction
+	(*IpoBidTransactions)(nil),            // 2: qubic.aggregation.general.v1.IpoBidTransactions
+	(*GetCurrentIpoBidsRequest)(nil),      // 3: qubic.aggregation.general.v1.GetCurrentIpoBidsRequest
+	(*GetCurrentIpoBidsResponse)(nil),     // 4: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse
+	(*IdentityBalance)(nil),               // 5: qubic.aggregation.general.v1.IdentityBalance
+	(*GetIdentitiesBalancesRequest)(nil),  // 6: qubic.aggregation.general.v1.GetIdentitiesBalancesRequest
+	(*GetIdentitiesBalancesResponse)(nil), // 7: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse
+	(*AssetOwnership)(nil),                // 8: qubic.aggregation.general.v1.AssetOwnership
+	(*AssetPossession)(nil),               // 9: qubic.aggregation.general.v1.AssetPossession
+	(*IdentityAssets)(nil),                // 10: qubic.aggregation.general.v1.IdentityAssets
+	(*GetIdentitiesAssetsRequest)(nil),    // 11: qubic.aggregation.general.v1.GetIdentitiesAssetsRequest
+	(*GetIdentitiesAssetsResponse)(nil),   // 12: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse
 }
 var file_qubic_aggregation_general_v1_messages_proto_depIdxs = []int32{
 	0,  // 0: qubic.aggregation.general.v1.BidTransaction.bid:type_name -> qubic.aggregation.general.v1.IpoBid
 	1,  // 1: qubic.aggregation.general.v1.IpoBidTransactions.transactions:type_name -> qubic.aggregation.general.v1.BidTransaction
 	2,  // 2: qubic.aggregation.general.v1.GetCurrentIpoBidsResponse.ipo_transactions:type_name -> qubic.aggregation.general.v1.IpoBidTransactions
 	5,  // 3: qubic.aggregation.general.v1.GetIdentitiesBalancesResponse.balances:type_name -> qubic.aggregation.general.v1.IdentityBalance
-	8,  // 4: qubic.aggregation.general.v1.GetSmartContractRewardsRequest.pagination:type_name -> qubic.aggregation.general.v1.Pagination
-	9,  // 5: qubic.aggregation.general.v1.GetSmartContractRewardsResponse.hits:type_name -> qubic.aggregation.general.v1.Hits
-	10, // 6: qubic.aggregation.general.v1.GetSmartContractRewardsResponse.distributions:type_name -> qubic.aggregation.general.v1.SmartContractRewardsDistribution
+	8,  // 4: qubic.aggregation.general.v1.IdentityAssets.ownerships:type_name -> qubic.aggregation.general.v1.AssetOwnership
+	9,  // 5: qubic.aggregation.general.v1.IdentityAssets.possessions:type_name -> qubic.aggregation.general.v1.AssetPossession
+	10, // 6: qubic.aggregation.general.v1.GetIdentitiesAssetsResponse.identity_assets:type_name -> qubic.aggregation.general.v1.IdentityAssets
 	7,  // [7:7] is the sub-list for method output_type
 	7,  // [7:7] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name

@@ -57,6 +57,18 @@ service AggregationGeneralService {
     };
   }
 
+  rpc GetIdentitiesAssets(GetIdentitiesAssetsRequest) returns (GetIdentitiesAssetsResponse) {
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Get asset balances for a list of identities."
+      description: "Allows for requesting the owned and possessed asset balances (tokens and smart contract shares) for a number of Qubic wallet identities."
+    };
+
+    option (google.api.http) = {
+      post: "/getIdentitiesAssets"
+      body: "*"
+    };
+  }
+
   rpc GetSmartContractRewards(GetSmartContractRewardsRequest) returns (GetSmartContractRewardsResponse) {
     option (gnostic.openapi.v3.operation) = {
       summary: "Get SC rewards / dividends distributions for a specific smart contract."

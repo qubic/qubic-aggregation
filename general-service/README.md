@@ -1,6 +1,6 @@
 # General Service
 
-General-purpose aggregation service. Currently provides IPO bid transaction aggregation and batch identity balance lookups.
+General-purpose aggregation service. Currently provides IPO bid transaction aggregation, batch identity balance lookups, and batch asset (ownerships + possessions) lookups.
 
 ## API
 
@@ -79,6 +79,56 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 }
 ```
 
+### `GetIdentitiesAssets`
+
+**gRPC**: `qubic.aggregation.general.v1.AggregationGeneralService/GetIdentitiesAssets`
+**HTTP**: `POST /getIdentitiesAssets`
+
+**Request**: up to 15 identity strings.
+
+```json
+{
+  "identities": ["IDENTITY_A", "IDENTITY_B"]
+}
+```
+
+**Response**: per-identity asset holdings split into separate ownership and possession lists, following the [glossary](https://github.com/qubic/qct/blob/main/docs/glossary.md) names. Ownership and possession may live under different managing contracts, so they're returned independently rather than merged.
+
+```json
+{
+  "identityAssets": [
+    {
+      "identity": "IDENTITY_A",
+      "ownerships": [
+        {
+          "asset_issuer": "CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL",
+          "asset_name": "CFB",
+          "managing_contract_index": 1,
+          "number_of_shares": 1000,
+          "tick_number": 22451873
+        },
+        {
+          "asset_issuer": "TFUYVBXYIYBVTEMJHAJGEJOOZHJBQFVQLTBBKMEHPEVIZFXZRPEYFUWGTIWG",
+          "asset_name": "QFT",
+          "managing_contract_index": 1,
+          "number_of_shares": 50,
+          "tick_number": 22451873
+        }
+      ],
+      "possessions": [
+        {
+          "asset_issuer": "CFBMEMZOIDEXQAUXYYSZIURADQLAPWPMNJXQSNVQZAHYVOPYUKKJBJUCTVJL",
+          "asset_name": "CFB",
+          "managing_contract_index": 1,
+          "number_of_shares": 1000,
+          "tick_number": 22451873
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## How It Works
 
 ### IPO Bids
@@ -95,6 +145,11 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 1. For each identity, concurrently fetches the balance from qubic-http (`GetBalance`).
 2. Returns all balance fields (current balance, transfer ticks, amounts, transfer counts).
 
+### Identity Assets
+
+1. For each identity, concurrently fetches owned assets (`GetOwnedAssets`) and possessed assets (`GetPossessedAssets`) from qubic-http.
+2. Returns them as two separate per-identity lists (`ownerships`, `possessions`) — no merging. Ownership and possession can be managed by different contracts, so they're surfaced as independent rows.
+
 ## Upstream Dependencies
 
 | Service | Method | Purpose |
@@ -102,6 +157,8 @@ General-purpose aggregation service. Currently provides IPO bid transaction aggr
 | qubic-http | `GetActiveIpos` | Active IPO contract indices |
 | qubic-http | `GetTickInfo` | Current epoch for tick range |
 | qubic-http | `GetBalance` | Identity balance data |
+| qubic-http | `GetOwnedAssets` | Owned asset holdings per identity |
+| qubic-http | `GetPossessedAssets` | Possessed asset holdings per identity |
 | status-service | `GetTickIntervals` | Epoch tick boundaries |
 | archive-query-service | `GetTransactionsForIdentity` | Bid transaction queries |
 
@@ -135,8 +192,8 @@ make test
 # Build
 go build ./cmd/general-service
 
-# Build Docker image
-docker build -t general-service .
+# Build Docker image (run from the monorepo root so `replace ../shared` resolves)
+docker build -t general-service -f general-service/Dockerfile .
 ```
 
 ## Project Structure

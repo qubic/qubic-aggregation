@@ -22,20 +22,22 @@ func newTestService(t *testing.T) (
 	*generalGrpc.Service,
 	*mocks.MockBidServicer,
 	*mocks.MockBalancesServicer,
+		*mocks.MockAssetsServicer,
 	*mocks.MockSmartContractRewardsServicer,
 	generalGrpc.PageSizeLimits,
 ) {
 	ctrl := gomock.NewController(t)
 	mockBid := mocks.NewMockBidServicer(ctrl)
 	mockBalances := mocks.NewMockBalancesServicer(ctrl)
+	mockAssets := mocks.NewMockAssetsServicer(ctrl)
 	mockSCRewards := mocks.NewMockSmartContractRewardsServicer(ctrl)
 	pageSizeLimits := generalGrpc.NewPageSizeLimits(1000, 10, 10000)
 	logger := zap.NewNop().Sugar()
-	return generalGrpc.NewService(logger, mockBid, mockBalances, mockSCRewards, pageSizeLimits), mockBid, mockBalances, mockSCRewards, pageSizeLimits
+	return generalGrpc.NewService(logger, mockBid, mockBalances,mockAssets, mockSCRewards, pageSizeLimits), mockBid, mockBalances, mockSCRewards, pageSizeLimits
 }
 
 func TestGetCurrentIpoBids_Success(t *testing.T) {
-	svc, mockBid, _, _, _ := newTestService(t)
+	svc, mockBid, _, _ := newTestService(t)
 
 	mockBid.EXPECT().GetCurrentIPOBidTransactions(gomock.Any(), []string{"id1"}).Return([]domain.IpoBidTransactions{
 		{
@@ -103,7 +105,7 @@ func TestGetCurrentIpoBids_TooManyIdentities(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_Exactly15Identities(t *testing.T) {
-	svc, mockBid, _, _, _ := newTestService(t)
+	svc, mockBid, _ := newTestService(t)
 
 	identities := make([]string, 15)
 	for i := range identities {
@@ -118,7 +120,7 @@ func TestGetCurrentIpoBids_Exactly15Identities(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_BidServiceError(t *testing.T) {
-	svc, mockBid, _, _, _ := newTestService(t)
+	svc, mockBid, _ := newTestService(t)
 
 	mockBid.EXPECT().GetCurrentIPOBidTransactions(gomock.Any(), []string{"id1"}).Return(nil, fmt.Errorf("internal failure"))
 
@@ -130,7 +132,7 @@ func TestGetCurrentIpoBids_BidServiceError(t *testing.T) {
 }
 
 func TestGetCurrentIpoBids_EmptyResult(t *testing.T) {
-	svc, mockBid, _, _, _ := newTestService(t)
+	svc, mockBid, _ := newTestService(t)
 
 	mockBid.EXPECT().GetCurrentIPOBidTransactions(gomock.Any(), []string{"id1"}).
 		Return([]domain.IpoBidTransactions{
@@ -144,7 +146,7 @@ func TestGetCurrentIpoBids_EmptyResult(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_Success(t *testing.T) {
-	svc, _, mockBalances, _, _ := newTestService(t)
+	svc, _, mockBalances := newTestService(t)
 
 	mockBalances.EXPECT().GetBalancesForIdentities(gomock.Any(), []string{"id1", "id2"}).Return([]domain.IdentityBalance{
 		{
@@ -192,7 +194,7 @@ func TestGetIdentitiesBalances_Success(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_TooManyIdentities(t *testing.T) {
-	svc, _, _, _, _ := newTestService(t)
+	svc, _, _ := newTestService(t)
 
 	identities := make([]string, 16)
 	for i := range identities {
@@ -207,7 +209,7 @@ func TestGetIdentitiesBalances_TooManyIdentities(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_Exactly15Identities(t *testing.T) {
-	svc, _, mockBalances, _, _ := newTestService(t)
+	svc, _, mockBalances := newTestService(t)
 
 	identities := make([]string, 15)
 	for i := range identities {
@@ -222,7 +224,7 @@ func TestGetIdentitiesBalances_Exactly15Identities(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_ServiceError(t *testing.T) {
-	svc, _, mockBalances, _, _ := newTestService(t)
+	svc, _, mockBalances := newTestService(t)
 
 	mockBalances.EXPECT().GetBalancesForIdentities(gomock.Any(), []string{"id1"}).Return(nil, fmt.Errorf("upstream failure"))
 
@@ -234,13 +236,82 @@ func TestGetIdentitiesBalances_ServiceError(t *testing.T) {
 }
 
 func TestGetIdentitiesBalances_EmptyResult(t *testing.T) {
-	svc, _, mockBalances, _, _ := newTestService(t)
+	svc, _, mockBalances := newTestService(t)
 
 	mockBalances.EXPECT().GetBalancesForIdentities(gomock.Any(), []string{"id1"}).Return([]domain.IdentityBalance{}, nil)
 
 	resp, err := svc.GetIdentitiesBalances(context.Background(), &pb.GetIdentitiesBalancesRequest{Identities: []string{"id1"}})
 	require.NoError(t, err)
 	assert.Empty(t, resp.Balances)
+}
+
+func TestGetIdentitiesAssets_Success(t *testing.T) {
+	svc, _, _, mockAssets := newTestService(t)
+
+	mockAssets.EXPECT().GetAssetsForIdentities(gomock.Any(), []string{"id1"}).Return([]domain.IdentityAssets{
+		{
+			Identity: "id1",
+			Ownerships: []domain.AssetOwnership{
+				{AssetIssuer: "CFBM", AssetName: "CFB", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 100},
+			},
+			Possessions: []domain.AssetPossession{
+				{AssetIssuer: "CFBM", AssetName: "CFB", ManagingContractIndex: 1, NumberOfShares: 1000, TickNumber: 101},
+			},
+		},
+	}, nil)
+
+	resp, err := svc.GetIdentitiesAssets(context.Background(), &pb.GetIdentitiesAssetsRequest{Identities: []string{"id1"}})
+	require.NoError(t, err)
+	require.Len(t, resp.IdentityAssets, 1)
+
+	a := resp.IdentityAssets[0]
+	assert.Equal(t, "id1", a.Identity)
+	require.Len(t, a.Ownerships, 1)
+	require.Len(t, a.Possessions, 1)
+	assert.Equal(t, "CFBM", a.Ownerships[0].AssetIssuer)
+	assert.Equal(t, "CFB", a.Ownerships[0].AssetName)
+	assert.Equal(t, uint32(1), a.Ownerships[0].ManagingContractIndex)
+	assert.Equal(t, int64(1000), a.Ownerships[0].NumberOfShares)
+	assert.Equal(t, uint32(100), a.Ownerships[0].TickNumber)
+	assert.Equal(t, int64(1000), a.Possessions[0].NumberOfShares)
+	assert.Equal(t, uint32(101), a.Possessions[0].TickNumber)
+}
+
+func TestGetIdentitiesAssets_TooManyIdentities(t *testing.T) {
+	svc, _, _, _ := newTestService(t)
+
+	identities := make([]string, 16)
+	for i := range identities {
+		identities[i] = fmt.Sprintf("id%d", i)
+	}
+
+	_, err := svc.GetIdentitiesAssets(context.Background(), &pb.GetIdentitiesAssetsRequest{Identities: identities})
+	require.Error(t, err)
+	st, ok := status.FromError(err)
+	require.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, st.Code())
+}
+
+func TestGetIdentitiesAssets_EmptyIdentities(t *testing.T) {
+	svc, _, _, _ := newTestService(t)
+
+	_, err := svc.GetIdentitiesAssets(context.Background(), &pb.GetIdentitiesAssetsRequest{Identities: []string{}})
+	require.Error(t, err)
+	st, ok := status.FromError(err)
+	require.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, st.Code())
+}
+
+func TestGetIdentitiesAssets_ServiceError(t *testing.T) {
+	svc, _, _, mockAssets := newTestService(t)
+
+	mockAssets.EXPECT().GetAssetsForIdentities(gomock.Any(), []string{"id1"}).Return(nil, fmt.Errorf("upstream failure"))
+
+	_, err := svc.GetIdentitiesAssets(context.Background(), &pb.GetIdentitiesAssetsRequest{Identities: []string{"id1"}})
+	require.Error(t, err)
+	st, ok := status.FromError(err)
+	require.True(t, ok)
+	assert.Equal(t, codes.Internal, st.Code())
 }
 
 func TestGetSmartContractRewards_Success(t *testing.T) {

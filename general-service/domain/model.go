@@ -63,6 +63,28 @@ type IdentityBalance struct {
 	NumberOfOutgoingTransfers  uint32
 }
 
+type AssetOwnership struct {
+	AssetIssuer           string
+	AssetName             string
+	ManagingContractIndex uint32
+	NumberOfShares        int64
+	TickNumber            uint32
+}
+
+type AssetPossession struct {
+	AssetIssuer           string
+	AssetName             string
+	ManagingContractIndex uint32
+	NumberOfShares        int64
+	TickNumber            uint32
+}
+
+type IdentityAssets struct {
+	Identity    string
+	Ownerships  []AssetOwnership
+	Possessions []AssetPossession
+}
+
 type Pagination struct {
 	Offset uint32
 	Size   uint32

@@ -110,10 +110,11 @@ func run(logger *zap.SugaredLogger) error {
 
 	bidService := domain.NewBidService(logger.Named("bid-service"), liveClient, statusClient, queryClient, cfg.Cache.IpoTtl, cfg.Cache.TickIntervalsTtl)
 	balancesService := domain.NewBalancesService(logger.Named("balances-service"), liveClient)
+	assetsService := domain.NewAssetsService(logger.Named("assets-service"), liveClient)
 	smartContractRewardsService := domain.NewSmartContractRewardsService(logger.Named("smart-contract-rewards-service"), elasticClient)
 
 	pageSizeLimits := grpc.NewPageSizeLimits(cfg.Pagination.MaxPageSize, cfg.Pagination.DefaultPageSize, cfg.Pagination.MaxHits)
-	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService, smartContractRewardsService, pageSizeLimits)
+	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService,assetsService smartContractRewardsService, pageSizeLimits)
 
 	errChan := make(chan error, 1)
 

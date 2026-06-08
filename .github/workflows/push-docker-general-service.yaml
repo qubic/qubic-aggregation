@@ -55,7 +55,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./general-service
+          context: .
           file: ./general-service/Dockerfile
           push: true
           tags: ghcr.io/qubic/qubic-aggregation-service:${{ steps.extract.outputs.version }}

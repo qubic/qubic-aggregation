@@ -180,3 +180,89 @@ func TestGetBalance_UpstreamError(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "requesting identity balance from live service")
 }
+
+func TestGetOwnedAssets_Success(t *testing.T) {
+	lsc, mock := newTestLiveClient(t)
+	ctx := context.Background()
+
+	mock.EXPECT().GetOwnedAssets(ctx, gomock.Any()).Return(&protobuff.OwnedAssetsResponse{
+		OwnedAssets: []*protobuff.OwnedAsset{
+			{
+				Data: &protobuff.OwnedAssetData{
+					OwnerIdentity:         "OWNER",
+					ManagingContractIndex: 1,
+					NumberOfUnits:         1000,
+					IssuedAsset: &protobuff.IssuedAssetData{
+						Name:           "CFB",
+						IssuerIdentity: "CFBM",
+					},
+				},
+				Info: &protobuff.AssetInfo{Tick: 100},
+			},
+		},
+	}, nil)
+
+	ownerships, err := lsc.GetOwnedAssets(ctx, "OWNER")
+	require.NoError(t, err)
+	require.Len(t, ownerships, 1)
+	assert.Equal(t, "CFB", ownerships[0].AssetName)
+	assert.Equal(t, "CFBM", ownerships[0].AssetIssuer)
+	assert.Equal(t, uint32(1), ownerships[0].ManagingContractIndex)
+	assert.Equal(t, int64(1000), ownerships[0].NumberOfShares)
+	assert.Equal(t, uint32(100), ownerships[0].TickNumber)
+}
+
+func TestGetOwnedAssets_UpstreamError(t *testing.T) {
+	lsc, mock := newTestLiveClient(t)
+	ctx := context.Background()
+
+	mock.EXPECT().GetOwnedAssets(ctx, gomock.Any()).Return(nil, fmt.Errorf("node unavailable"))
+
+	_, err := lsc.GetOwnedAssets(ctx, "OWNER")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "requesting owned assets from live service")
+}
+
+func TestGetPossessedAssets_Success(t *testing.T) {
+	lsc, mock := newTestLiveClient(t)
+	ctx := context.Background()
+
+	mock.EXPECT().GetPossessedAssets(ctx, gomock.Any()).Return(&protobuff.PossessedAssetsResponse{
+		PossessedAssets: []*protobuff.PossessedAsset{
+			{
+				Data: &protobuff.PossessedAssetData{
+					PossessorIdentity:     "POSS",
+					ManagingContractIndex: 1,
+					NumberOfUnits:         500,
+					OwnedAsset: &protobuff.OwnedAssetData{
+						IssuedAsset: &protobuff.IssuedAssetData{
+							Name:           "QFT",
+							IssuerIdentity: "TFUY",
+						},
+					},
+				},
+				Info: &protobuff.AssetInfo{Tick: 200},
+			},
+		},
+	}, nil)
+
+	possessions, err := lsc.GetPossessedAssets(ctx, "POSS")
+	require.NoError(t, err)
+	require.Len(t, possessions, 1)
+	assert.Equal(t, "QFT", possessions[0].AssetName)
+	assert.Equal(t, "TFUY", possessions[0].AssetIssuer)
+	assert.Equal(t, uint32(1), possessions[0].ManagingContractIndex)
+	assert.Equal(t, int64(500), possessions[0].NumberOfShares)
+	assert.Equal(t, uint32(200), possessions[0].TickNumber)
+}
+
+func TestGetPossessedAssets_UpstreamError(t *testing.T) {
+	lsc, mock := newTestLiveClient(t)
+	ctx := context.Background()
+
+	mock.EXPECT().GetPossessedAssets(ctx, gomock.Any()).Return(nil, fmt.Errorf("node unavailable"))
+
+	_, err := lsc.GetPossessedAssets(ctx, "POSS")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "requesting possessed assets from live service")
+}

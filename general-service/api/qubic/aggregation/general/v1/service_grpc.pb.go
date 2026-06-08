@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AggregationGeneralService_GetCurrentIpoBids_FullMethodName       = "/qubic.aggregation.general.v1.AggregationGeneralService/GetCurrentIpoBids"
-	AggregationGeneralService_GetIdentitiesBalances_FullMethodName   = "/qubic.aggregation.general.v1.AggregationGeneralService/GetIdentitiesBalances"
-	AggregationGeneralService_GetSmartContractRewards_FullMethodName = "/qubic.aggregation.general.v1.AggregationGeneralService/GetSmartContractRewards"
+	AggregationGeneralService_GetCurrentIpoBids_FullMethodName     = "/qubic.aggregation.general.v1.AggregationGeneralService/GetCurrentIpoBids"
+	AggregationGeneralService_GetIdentitiesBalances_FullMethodName = "/qubic.aggregation.general.v1.AggregationGeneralService/GetIdentitiesBalances"
+	AggregationGeneralService_GetIdentitiesAssets_FullMethodName   = "/qubic.aggregation.general.v1.AggregationGeneralService/GetIdentitiesAssets"
 )
 
 // AggregationGeneralServiceClient is the client API for AggregationGeneralService service.
@@ -30,7 +30,7 @@ const (
 type AggregationGeneralServiceClient interface {
 	GetCurrentIpoBids(ctx context.Context, in *GetCurrentIpoBidsRequest, opts ...grpc.CallOption) (*GetCurrentIpoBidsResponse, error)
 	GetIdentitiesBalances(ctx context.Context, in *GetIdentitiesBalancesRequest, opts ...grpc.CallOption) (*GetIdentitiesBalancesResponse, error)
-	GetSmartContractRewards(ctx context.Context, in *GetSmartContractRewardsRequest, opts ...grpc.CallOption) (*GetSmartContractRewardsResponse, error)
+	GetIdentitiesAssets(ctx context.Context, in *GetIdentitiesAssetsRequest, opts ...grpc.CallOption) (*GetIdentitiesAssetsResponse, error)
 }
 
 type aggregationGeneralServiceClient struct {
@@ -61,10 +61,10 @@ func (c *aggregationGeneralServiceClient) GetIdentitiesBalances(ctx context.Cont
 	return out, nil
 }
 
-func (c *aggregationGeneralServiceClient) GetSmartContractRewards(ctx context.Context, in *GetSmartContractRewardsRequest, opts ...grpc.CallOption) (*GetSmartContractRewardsResponse, error) {
+func (c *aggregationGeneralServiceClient) GetIdentitiesAssets(ctx context.Context, in *GetIdentitiesAssetsRequest, opts ...grpc.CallOption) (*GetIdentitiesAssetsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetSmartContractRewardsResponse)
-	err := c.cc.Invoke(ctx, AggregationGeneralService_GetSmartContractRewards_FullMethodName, in, out, cOpts...)
+	out := new(GetIdentitiesAssetsResponse)
+	err := c.cc.Invoke(ctx, AggregationGeneralService_GetIdentitiesAssets_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *aggregationGeneralServiceClient) GetSmartContractRewards(ctx context.Co
 type AggregationGeneralServiceServer interface {
 	GetCurrentIpoBids(context.Context, *GetCurrentIpoBidsRequest) (*GetCurrentIpoBidsResponse, error)
 	GetIdentitiesBalances(context.Context, *GetIdentitiesBalancesRequest) (*GetIdentitiesBalancesResponse, error)
-	GetSmartContractRewards(context.Context, *GetSmartContractRewardsRequest) (*GetSmartContractRewardsResponse, error)
+	GetIdentitiesAssets(context.Context, *GetIdentitiesAssetsRequest) (*GetIdentitiesAssetsResponse, error)
 	mustEmbedUnimplementedAggregationGeneralServiceServer()
 }
 
@@ -94,8 +94,8 @@ func (UnimplementedAggregationGeneralServiceServer) GetCurrentIpoBids(context.Co
 func (UnimplementedAggregationGeneralServiceServer) GetIdentitiesBalances(context.Context, *GetIdentitiesBalancesRequest) (*GetIdentitiesBalancesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetIdentitiesBalances not implemented")
 }
-func (UnimplementedAggregationGeneralServiceServer) GetSmartContractRewards(context.Context, *GetSmartContractRewardsRequest) (*GetSmartContractRewardsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetSmartContractRewards not implemented")
+func (UnimplementedAggregationGeneralServiceServer) GetIdentitiesAssets(context.Context, *GetIdentitiesAssetsRequest) (*GetIdentitiesAssetsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetIdentitiesAssets not implemented")
 }
 func (UnimplementedAggregationGeneralServiceServer) mustEmbedUnimplementedAggregationGeneralServiceServer() {
 }
@@ -155,20 +155,20 @@ func _AggregationGeneralService_GetIdentitiesBalances_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AggregationGeneralService_GetSmartContractRewards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSmartContractRewardsRequest)
+func _AggregationGeneralService_GetIdentitiesAssets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIdentitiesAssetsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AggregationGeneralServiceServer).GetSmartContractRewards(ctx, in)
+		return srv.(AggregationGeneralServiceServer).GetIdentitiesAssets(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AggregationGeneralService_GetSmartContractRewards_FullMethodName,
+		FullMethod: AggregationGeneralService_GetIdentitiesAssets_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AggregationGeneralServiceServer).GetSmartContractRewards(ctx, req.(*GetSmartContractRewardsRequest))
+		return srv.(AggregationGeneralServiceServer).GetIdentitiesAssets(ctx, req.(*GetIdentitiesAssetsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -189,8 +189,8 @@ var AggregationGeneralService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AggregationGeneralService_GetIdentitiesBalances_Handler,
 		},
 		{
-			MethodName: "GetSmartContractRewards",
-			Handler:    _AggregationGeneralService_GetSmartContractRewards_Handler,
+			MethodName: "GetIdentitiesAssets",
+			Handler:    _AggregationGeneralService_GetIdentitiesAssets_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
