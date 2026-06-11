@@ -155,6 +155,21 @@ func (m *MockStatusService) EXPECT() *MockStatusServiceMockRecorder {
 	return m.recorder
 }
 
+// GetIngestionPipelineStatus mocks base method.
+func (m *MockStatusService) GetIngestionPipelineStatus(ctx context.Context) (domain.IngestionPipelineStatus, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIngestionPipelineStatus", ctx)
+	ret0, _ := ret[0].(domain.IngestionPipelineStatus)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIngestionPipelineStatus indicates an expected call of GetIngestionPipelineStatus.
+func (mr *MockStatusServiceMockRecorder) GetIngestionPipelineStatus(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIngestionPipelineStatus", reflect.TypeOf((*MockStatusService)(nil).GetIngestionPipelineStatus), ctx)
+}
+
 // GetTickIntervals mocks base method.
 func (m *MockStatusService) GetTickIntervals(ctx context.Context) (map[uint32][]domain.TickInterval, error) {
 	m.ctrl.T.Helper()
@@ -234,18 +249,18 @@ func (m *MockElasticService) EXPECT() *MockElasticServiceMockRecorder {
 }
 
 // GetSmartContractDividendDistributions mocks base method.
-func (m *MockElasticService) GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination domain.Pagination) (*domain.SmartContractRewardsDistributionsResult, error) {
+func (m *MockElasticService) GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination domain.Pagination, maxTick uint32) (*domain.SmartContractRewardsDistributionsResult, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSmartContractDividendDistributions", ctx, identity, pagination)
+	ret := m.ctrl.Call(m, "GetSmartContractDividendDistributions", ctx, identity, pagination, maxTick)
 	ret0, _ := ret[0].(*domain.SmartContractRewardsDistributionsResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetSmartContractDividendDistributions indicates an expected call of GetSmartContractDividendDistributions.
-func (mr *MockElasticServiceMockRecorder) GetSmartContractDividendDistributions(ctx, identity, pagination any) *gomock.Call {
+func (mr *MockElasticServiceMockRecorder) GetSmartContractDividendDistributions(ctx, identity, pagination, maxTick any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSmartContractDividendDistributions", reflect.TypeOf((*MockElasticService)(nil).GetSmartContractDividendDistributions), ctx, identity, pagination)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSmartContractDividendDistributions", reflect.TypeOf((*MockElasticService)(nil).GetSmartContractDividendDistributions), ctx, identity, pagination, maxTick)
 }
 
 // MockBidServicer is a mock of BidServicer interface.

@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/qubic/qubic-aggregation/general-service/domain"
 	"go.uber.org/zap"
-	"io"
 )
 
 type scDividendAggResponse struct {
@@ -68,7 +69,7 @@ func NewElasticClient(eventsElasticSearchClient *elasticsearch.Client, eventsInd
 	}
 }
 
-func (c *ElasticClient) GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination domain.Pagination) (*domain.SmartContractRewardsDistributionsResult, error) {
+func (c *ElasticClient) GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination domain.Pagination, maxTick uint32) (*domain.SmartContractRewardsDistributionsResult, error) {
 
 	// terms.size must be at least offset+size so bucket_sort can slice correctly
 	termsSize := defaultTermsMaxSize
@@ -84,6 +85,9 @@ func (c *ElasticClient) GetSmartContractDividendDistributions(ctx context.Contex
 					map[string]any{"term": map[string]any{"source": identity}},
 					map[string]any{"term": map[string]any{"logType": dividendLogType}},
 					map[string]any{"term": map[string]any{"categories": dividendCategory}},
+				},
+				"filter": []any{
+					map[string]any{"range": map[string]any{"tickNumber": map[string]any{"lte": maxTick}}},
 				},
 			},
 		},
@@ -158,7 +162,9 @@ func (c *ElasticClient) GetSmartContractDividendDistributions(ctx context.Contex
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
 
-	return mapDividendAggResponse(&esResp), nil
+	result := mapDividendAggResponse(&esResp)
+	result.ValidForTick = maxTick
+	return result, nil
 }
 
 func mapDividendAggResponse(esResp *scDividendAggResponse) *domain.SmartContractRewardsDistributionsResult {

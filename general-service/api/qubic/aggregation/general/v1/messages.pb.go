@@ -1111,6 +1111,7 @@ type GetSmartContractRewardsResponse struct {
 	SmartContractAddress    string                              `protobuf:"bytes,2,opt,name=smart_contract_address,json=smartContractAddress,proto3" json:"smart_contract_address,omitempty"`
 	TotalAllTimeDistributed int64                               `protobuf:"varint,3,opt,name=total_all_time_distributed,json=totalAllTimeDistributed,proto3" json:"total_all_time_distributed,omitempty"`
 	Distributions           []*SmartContractRewardsDistribution `protobuf:"bytes,4,rep,name=distributions,proto3" json:"distributions,omitempty"`
+	ValidForTick            uint32                              `protobuf:"varint,5,opt,name=valid_for_tick,json=validForTick,proto3" json:"valid_for_tick,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -1171,6 +1172,13 @@ func (x *GetSmartContractRewardsResponse) GetDistributions() []*SmartContractRew
 		return x.Distributions
 	}
 	return nil
+}
+
+func (x *GetSmartContractRewardsResponse) GetValidForTick() uint32 {
+	if x != nil {
+		return x.ValidForTick
+	}
+	return 0
 }
 
 var File_qubic_aggregation_general_v1_messages_proto protoreflect.FileDescriptor
@@ -1276,12 +1284,13 @@ const file_qubic_aggregation_general_v1_messages_proto_rawDesc = "" +
 	"\x16smart_contract_address\x18\x01 \x01(\tR\x14smartContractAddress\x12H\n" +
 	"\n" +
 	"pagination\x18\x02 \x01(\v2(.qubic.aggregation.general.v1.PaginationR\n" +
-	"pagination\"\xb2\x02\n" +
+	"pagination\"\xd8\x02\n" +
 	"\x1fGetSmartContractRewardsResponse\x126\n" +
 	"\x04hits\x18\x01 \x01(\v2\".qubic.aggregation.general.v1.HitsR\x04hits\x124\n" +
 	"\x16smart_contract_address\x18\x02 \x01(\tR\x14smartContractAddress\x12;\n" +
 	"\x1atotal_all_time_distributed\x18\x03 \x01(\x03R\x17totalAllTimeDistributed\x12d\n" +
-	"\rdistributions\x18\x04 \x03(\v2>.qubic.aggregation.general.v1.SmartContractRewardsDistributionR\rdistributionsBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
+	"\rdistributions\x18\x04 \x03(\v2>.qubic.aggregation.general.v1.SmartContractRewardsDistributionR\rdistributions\x12$\n" +
+	"\x0evalid_for_tick\x18\x05 \x01(\rR\fvalidForTickBCZAgithub.com/qubic/qubic-aggregation/general-service/api/general/v1b\x06proto3"
 
 var (
 	file_qubic_aggregation_general_v1_messages_proto_rawDescOnce sync.Once

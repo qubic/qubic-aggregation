@@ -173,6 +173,7 @@ func (s *Service) GetSmartContractRewards(ctx context.Context, req *pb.GetSmartC
 		SmartContractAddress:    req.SmartContractAddress,
 		TotalAllTimeDistributed: result.TotalAllTimeDistributed,
 		Distributions:           distributions,
+		ValidForTick:            result.ValidForTick,
 	}, nil
 }
 

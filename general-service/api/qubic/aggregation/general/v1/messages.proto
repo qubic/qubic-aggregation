@@ -119,4 +119,5 @@ message GetSmartContractRewardsResponse {
   string smart_contract_address = 2;
   int64 total_all_time_distributed = 3;
   repeated SmartContractRewardsDistribution distributions = 4;
+  uint32 valid_for_tick = 5;
 }

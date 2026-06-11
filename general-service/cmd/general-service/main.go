@@ -47,6 +47,7 @@ func run(logger *zap.SugaredLogger) error {
 		Cache    struct {
 			IpoTtl           time.Duration `conf:"default:20m"`
 			TickIntervalsTtl time.Duration `conf:"default:20m"`
+			StatusTtl        time.Duration `conf:"default:1s"`
 		}
 		EventsElasticSearch struct {
 			Address         []string      `conf:"default:https://localhost:9200"`
@@ -94,7 +95,10 @@ func run(logger *zap.SugaredLogger) error {
 		return fmt.Errorf("creating status service client connection: %w", err)
 	}
 	defer statusServiceGrpcConn.Close()
-	statusClient := clients.NewStatusServiceClient(statusServiceGrpcConn, logger.Named("status-service"))
+	statusClient := clients.NewStatusServiceClient(statusServiceGrpcConn, logger.Named("status-service"), cfg.Cache.StatusTtl)
+
+	go statusClient.Start()
+	defer statusClient.Stop()
 
 	eventsEsClient, err := createEventsESClient(
 		cfg.EventsElasticSearch.Address,
@@ -112,7 +116,7 @@ func run(logger *zap.SugaredLogger) error {
 	bidService := domain.NewBidService(logger.Named("bid-service"), liveClient, statusClient, queryClient, cfg.Cache.IpoTtl, cfg.Cache.TickIntervalsTtl)
 	balancesService := domain.NewBalancesService(logger.Named("balances-service"), liveClient)
 	assetsService := domain.NewAssetsService(logger.Named("assets-service"), liveClient)
-	smartContractRewardsService := domain.NewSmartContractRewardsService(logger.Named("smart-contract-rewards-service"), elasticClient)
+	smartContractRewardsService := domain.NewSmartContractRewardsService(logger.Named("smart-contract-rewards-service"), elasticClient, statusClient)
 
 	pageSizeLimits := grpc.NewPageSizeLimits(cfg.Pagination.MaxPageSize, cfg.Pagination.DefaultPageSize, cfg.Pagination.MaxHits)
 	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService, assetsService, smartContractRewardsService, pageSizeLimits)

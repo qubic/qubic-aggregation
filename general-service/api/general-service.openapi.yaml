@@ -213,6 +213,9 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/SmartContractRewardsDistribution'
+                validForTick:
+                    type: integer
+                    format: uint32
         Hits:
             type: object
             properties:

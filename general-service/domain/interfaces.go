@@ -17,6 +17,7 @@ type LiveService interface {
 
 type StatusService interface {
 	GetTickIntervals(ctx context.Context) (map[uint32][]TickInterval, error)
+	GetIngestionPipelineStatus(ctx context.Context) (IngestionPipelineStatus, error)
 }
 
 type QueryService interface {
@@ -24,7 +25,7 @@ type QueryService interface {
 }
 
 type ElasticService interface {
-	GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination Pagination) (*SmartContractRewardsDistributionsResult, error)
+	GetSmartContractDividendDistributions(ctx context.Context, identity string, pagination Pagination, maxTick uint32) (*SmartContractRewardsDistributionsResult, error)
 }
 
 type BidServicer interface {

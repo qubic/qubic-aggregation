@@ -103,6 +103,14 @@ type SmartContractRewardsDistributionsResult struct {
 	TotalHits               uint32
 	TotalAllTimeDistributed int64
 	Distributions           []SmartContractRewardsDistribution
+	ValidForTick            uint32
+}
+
+type IngestionPipelineStatus struct {
+	LastProcessedTick    uint32
+	ProcessingEpoch      uint32
+	IntervalInitialTick  uint32
+	LastProcessedLogTick uint32
 }
 
 func GetEpochIntervalsAbsoluteRange(epochIntervals []TickInterval) (first, last uint32) {

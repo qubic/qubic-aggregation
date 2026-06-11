@@ -328,6 +328,7 @@ func TestGetSmartContractRewards_Success(t *testing.T) {
 
 		TotalHits:               2,
 		TotalAllTimeDistributed: 640000,
+		ValidForTick:            18000000,
 		Distributions: []domain.SmartContractRewardsDistribution{
 			{
 				TotalAmount:    128000,
@@ -380,6 +381,7 @@ func TestGetSmartContractRewards_Success(t *testing.T) {
 
 	require.Equal(t, "EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVWRF", resp.SmartContractAddress)
 	require.Equal(t, int64(640000), resp.TotalAllTimeDistributed)
+	require.Equal(t, uint32(18000000), resp.ValidForTick)
 	require.Equal(t, uint32(len(resp.Distributions)), resp.Hits.Total)
 
 }
