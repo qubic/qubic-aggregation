@@ -69,4 +69,16 @@ service AggregationGeneralService {
     };
   }
 
+  rpc GetSmartContractRewards(GetSmartContractRewardsRequest) returns (GetSmartContractRewardsResponse) {
+    option (gnostic.openapi.v3.operation) = {
+      summary: "Get SC rewards / dividends distributions for a specific smart contract."
+      description: "Allows for requesting the distribution of SC rewards across ticks."
+    };
+
+    option (google.api.http) = {
+      post: "/getSmartContractRewards"
+      body: "*"
+    };
+  }
+
 }

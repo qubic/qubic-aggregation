@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v8"
+
 	"github.com/ardanlabs/conf/v3"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/qubic/qubic-aggregation/general-service/clients"
@@ -45,6 +47,21 @@ func run(logger *zap.SugaredLogger) error {
 		Cache    struct {
 			IpoTtl           time.Duration `conf:"default:20m"`
 			TickIntervalsTtl time.Duration `conf:"default:20m"`
+			StatusTtl        time.Duration `conf:"default:1s"`
+		}
+		EventsElasticSearch struct {
+			Address         []string      `conf:"default:https://localhost:9200"`
+			Username        string        `conf:"default:qubic-query"`
+			Password        string        `conf:"mask,optional"`
+			CertificatePath string        `conf:"default:http_ca.crt"`
+			MaxRetries      int           `conf:"default:3"`
+			ReadTimeout     time.Duration `conf:"default:10s"`
+			EventsIndex     string        `conf:"default:qubic-event-logs-read"`
+		}
+		Pagination struct {
+			MaxPageSize     uint32 `conf:"default:1000"`
+			DefaultPageSize uint32 `conf:"default:10"`
+			MaxHits         uint32 `conf:"default:10000"`
 		}
 	}
 
@@ -78,13 +95,31 @@ func run(logger *zap.SugaredLogger) error {
 		return fmt.Errorf("creating status service client connection: %w", err)
 	}
 	defer statusServiceGrpcConn.Close()
-	statusClient := clients.NewStatusServiceClient(statusServiceGrpcConn, logger.Named("status-service"))
+	statusClient := clients.NewStatusServiceClient(statusServiceGrpcConn, logger.Named("status-service"), cfg.Cache.StatusTtl)
+
+	go statusClient.Start()
+	defer statusClient.Stop()
+
+	eventsEsClient, err := createEventsESClient(
+		cfg.EventsElasticSearch.Address,
+		cfg.EventsElasticSearch.Username,
+		cfg.EventsElasticSearch.Password,
+		cfg.EventsElasticSearch.CertificatePath,
+		cfg.EventsElasticSearch.MaxRetries,
+		cfg.EventsElasticSearch.ReadTimeout,
+	)
+	if err != nil {
+		return fmt.Errorf("creating events elasticsearch client: %w", err)
+	}
+	elasticClient := clients.NewElasticClient(eventsEsClient, cfg.EventsElasticSearch.EventsIndex, logger.Named("elastic-service"))
 
 	bidService := domain.NewBidService(logger.Named("bid-service"), liveClient, statusClient, queryClient, cfg.Cache.IpoTtl, cfg.Cache.TickIntervalsTtl)
 	balancesService := domain.NewBalancesService(logger.Named("balances-service"), liveClient)
 	assetsService := domain.NewAssetsService(logger.Named("assets-service"), liveClient)
+	smartContractRewardsService := domain.NewSmartContractRewardsService(logger.Named("smart-contract-rewards-service"), elasticClient, statusClient)
 
-	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService, assetsService)
+	pageSizeLimits := grpc.NewPageSizeLimits(cfg.Pagination.MaxPageSize, cfg.Pagination.DefaultPageSize, cfg.Pagination.MaxHits)
+	grpcService := grpc.NewService(logger.Named("grpc"), bidService, balancesService, assetsService, smartContractRewardsService, pageSizeLimits)
 
 	errChan := make(chan error, 1)
 
@@ -119,4 +154,28 @@ func run(logger *zap.SugaredLogger) error {
 	}
 
 	return nil
+}
+
+func createEventsESClient(
+	addresses []string, username, password, certPath string, maxRetries int, readTimeout time.Duration,
+) (*elasticsearch.Client, error) {
+	cert, err := os.ReadFile(certPath)
+	if err != nil {
+		log.Printf("warn: Failed to load Events Elastic certificate file: %v\n", err)
+	}
+
+	esCfg := elasticsearch.Config{
+		Addresses:     addresses,
+		Username:      username,
+		Password:      password,
+		CACert:        cert,
+		RetryOnStatus: []int{502, 503, 504, 429},
+		MaxRetries:    maxRetries,
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: readTimeout,
+		},
+	}
+
+	return elasticsearch.NewClient(esCfg)
 }

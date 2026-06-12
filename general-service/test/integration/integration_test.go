@@ -119,7 +119,7 @@ func newTestEnv(t *testing.T) *testEnv {
 
 	logger := zap.NewNop().Sugar()
 	liveClient := clients.NewLiveServiceClient(liveConn, logger)
-	statusClient := clients.NewStatusServiceClient(statusConn, logger)
+	statusClient := clients.NewStatusServiceClient(statusConn, logger, time.Second)
 	queryClient := clients.NewQueryServiceClient(queryConn, logger)
 
 	bidService := domain.NewBidService(logger, liveClient, statusClient, queryClient, 1*time.Minute, 1*time.Minute)

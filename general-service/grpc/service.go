@@ -1,8 +1,13 @@
 package grpc
 
 import (
+	"bytes"
 	"context"
+	"encoding/binary"
+	"fmt"
+	"strings"
 
+	"github.com/qubic/go-node-connector/v2/types"
 	pb "github.com/qubic/qubic-aggregation/general-service/api/qubic/aggregation/general/v1"
 	"github.com/qubic/qubic-aggregation/general-service/domain"
 	"go.uber.org/zap"
@@ -12,18 +17,28 @@ import (
 
 type Service struct {
 	pb.UnimplementedAggregationGeneralServiceServer
-	logger          *zap.SugaredLogger
-	bidsService     domain.BidServicer
-	balancesService domain.BalancesServicer
-	assetsService   domain.AssetsServicer
+	logger                      *zap.SugaredLogger
+	bidsService                 domain.BidServicer
+	balancesService             domain.BalancesServicer
+	assetsService               domain.AssetsServicer
+	smartContractRewardsService domain.SmartContractRewardsServicer
+
+	pageSizeLimits PageSizeLimits
 }
 
-func NewService(logger *zap.SugaredLogger, bidService domain.BidServicer, balancesService domain.BalancesServicer, assetsService domain.AssetsServicer) *Service {
+func NewService(logger *zap.SugaredLogger,
+	bidService domain.BidServicer,
+	balancesService domain.BalancesServicer,
+	assetsService domain.AssetsServicer,
+	smartContractRewardsService domain.SmartContractRewardsServicer,
+	pageSizeLimits PageSizeLimits) *Service {
 	return &Service{
-		logger:          logger,
-		bidsService:     bidService,
-		balancesService: balancesService,
-		assetsService:   assetsService,
+		logger:                      logger,
+		bidsService:                 bidService,
+		balancesService:             balancesService,
+		assetsService:               assetsService,
+		smartContractRewardsService: smartContractRewardsService,
+		pageSizeLimits:              pageSizeLimits,
 	}
 }
 
@@ -106,6 +121,83 @@ func (s *Service) GetIdentitiesBalances(ctx context.Context, req *pb.GetIdentiti
 	}
 
 	return &pb.GetIdentitiesBalancesResponse{Balances: balances}, nil
+}
+
+func (s *Service) GetSmartContractRewards(ctx context.Context, req *pb.GetSmartContractRewardsRequest) (*pb.GetSmartContractRewardsResponse, error) {
+
+	if len(req.SmartContractAddress) != 60 {
+		return nil, status.Errorf(codes.InvalidArgument, "bad smart contract identity length. expected 60 got %d", len(req.SmartContractAddress))
+	}
+
+	if req.SmartContractAddress != strings.ToUpper(req.SmartContractAddress) {
+		return nil, status.Errorf(codes.InvalidArgument, "bad smart contract identity. expected all characters to be uppercase")
+	}
+
+	err := validateSmartContractIdentity(req.SmartContractAddress)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "bad smart contract identity: %v", err)
+	}
+
+	from, size, err := s.pageSizeLimits.ValidatePagination(req.GetPagination())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid pagination: %v", err)
+	}
+
+	result, err := s.smartContractRewardsService.GetRewardsDistributionsForSmartContract(ctx, req.SmartContractAddress, domain.Pagination{
+		Offset: from,
+		Size:   size,
+	})
+	if err != nil {
+		s.logger.Errorw("failed to get rewards distributions", "err", err)
+		return nil, status.Errorf(codes.Internal, "failed to get rewards distributions")
+	}
+
+	var distributions []*pb.SmartContractRewardsDistribution
+	for _, distribution := range result.Distributions {
+		distributions = append(distributions, &pb.SmartContractRewardsDistribution{
+			TotalAmount:    distribution.TotalAmount,
+			TransferCount:  distribution.TransferCount,
+			AmountPerShare: distribution.AmountPerShare,
+			TickNumber:     distribution.TickNumber,
+			Timestamp:      distribution.Timestamp,
+			Epoch:          distribution.Epoch,
+		})
+	}
+
+	return &pb.GetSmartContractRewardsResponse{
+		Hits: &pb.Hits{
+			Total: result.TotalHits,
+			From:  from,
+			Size:  size,
+		},
+		SmartContractAddress:    req.SmartContractAddress,
+		TotalAllTimeDistributed: result.TotalAllTimeDistributed,
+		Distributions:           distributions,
+		ValidForTick:            result.ValidForTick,
+	}, nil
+}
+
+var zero24 [24]byte
+
+func validateSmartContractIdentity(identity string) error {
+
+	id := types.Identity(identity)
+	pubKey, err := id.ToPubKey(false)
+	if err != nil {
+		return fmt.Errorf("converting identity to public key: %w", err)
+	}
+
+	// Last 24 bytes of SC public key must be empty
+	if !bytes.Equal(pubKey[8:32], zero24[:]) {
+		return fmt.Errorf("identity does not belong to a smart contract")
+	}
+
+	// First 8 bytes of SC public key represent its index and can be 1 - 1023
+	if index := binary.LittleEndian.Uint64(pubKey[0:8]); index < 1 || index > 1023 {
+		return fmt.Errorf("identity is not a valid for smart contracts")
+	}
+
+	return nil
 }
 
 func (s *Service) GetIdentitiesAssets(ctx context.Context, req *pb.GetIdentitiesAssetsRequest) (*pb.GetIdentitiesAssetsResponse, error) {
