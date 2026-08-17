@@ -56,6 +56,21 @@ func (mr *MockLiveServiceMockRecorder) GetActiveIpos(ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveIpos", reflect.TypeOf((*MockLiveService)(nil).GetActiveIpos), ctx)
 }
 
+// GetAssetsForIdentities mocks base method.
+func (m *MockLiveService) GetAssetsForIdentities(ctx context.Context, identities []string) ([]domain.IdentityAssets, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssetsForIdentities", ctx, identities)
+	ret0, _ := ret[0].([]domain.IdentityAssets)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetsForIdentities indicates an expected call of GetAssetsForIdentities.
+func (mr *MockLiveServiceMockRecorder) GetAssetsForIdentities(ctx, identities any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetsForIdentities", reflect.TypeOf((*MockLiveService)(nil).GetAssetsForIdentities), ctx, identities)
+}
+
 // GetBalance mocks base method.
 func (m *MockLiveService) GetBalance(ctx context.Context, identity string) (domain.IdentityBalance, error) {
 	m.ctrl.T.Helper()
@@ -84,36 +99,6 @@ func (m *MockLiveService) GetContractIpoBids(ctx context.Context, contractIndex 
 func (mr *MockLiveServiceMockRecorder) GetContractIpoBids(ctx, contractIndex any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContractIpoBids", reflect.TypeOf((*MockLiveService)(nil).GetContractIpoBids), ctx, contractIndex)
-}
-
-// GetOwnedAssets mocks base method.
-func (m *MockLiveService) GetOwnedAssets(ctx context.Context, identity string) ([]domain.AssetOwnership, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOwnedAssets", ctx, identity)
-	ret0, _ := ret[0].([]domain.AssetOwnership)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetOwnedAssets indicates an expected call of GetOwnedAssets.
-func (mr *MockLiveServiceMockRecorder) GetOwnedAssets(ctx, identity any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOwnedAssets", reflect.TypeOf((*MockLiveService)(nil).GetOwnedAssets), ctx, identity)
-}
-
-// GetPossessedAssets mocks base method.
-func (m *MockLiveService) GetPossessedAssets(ctx context.Context, identity string) ([]domain.AssetPossession, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPossessedAssets", ctx, identity)
-	ret0, _ := ret[0].([]domain.AssetPossession)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPossessedAssets indicates an expected call of GetPossessedAssets.
-func (mr *MockLiveServiceMockRecorder) GetPossessedAssets(ctx, identity any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPossessedAssets", reflect.TypeOf((*MockLiveService)(nil).GetPossessedAssets), ctx, identity)
 }
 
 // GetTickInfo mocks base method.

@@ -181,88 +181,201 @@ func TestGetBalance_UpstreamError(t *testing.T) {
 	assert.Contains(t, err.Error(), "requesting identity balance from live service")
 }
 
-func TestGetOwnedAssets_Success(t *testing.T) {
+func ownedAsset(name, issuer string, managingContractIndex uint32, units int64, tick uint32) *protobuff.OwnedAsset {
+	return &protobuff.OwnedAsset{
+		Data: &protobuff.OwnedAssetData{
+			OwnerIdentity:         "OWNER",
+			ManagingContractIndex: managingContractIndex,
+			NumberOfUnits:         units,
+			IssuedAsset: &protobuff.IssuedAssetData{
+				Name:           name,
+				IssuerIdentity: issuer,
+			},
+		},
+		Info: &protobuff.AssetInfo{Tick: tick},
+	}
+}
+
+func possessedAsset(name, issuer string, managingContractIndex uint32, units int64, tick uint32) *protobuff.PossessedAsset {
+	return &protobuff.PossessedAsset{
+		Data: &protobuff.PossessedAssetData{
+			PossessorIdentity:     "POSSESSOR",
+			ManagingContractIndex: managingContractIndex,
+			NumberOfUnits:         units,
+			// deliberately different from the possession's own values: issuer and name must
+			// be read from the wrapped ownership record, the rest from the possession itself
+			OwnedAsset: &protobuff.OwnedAssetData{
+				ManagingContractIndex: managingContractIndex + 100,
+				NumberOfUnits:         units + 100,
+				IssuedAsset: &protobuff.IssuedAssetData{
+					Name:           name,
+					IssuerIdentity: issuer,
+				},
+			},
+		},
+		Info: &protobuff.AssetInfo{Tick: tick},
+	}
+}
+
+func TestGetAssetsForIdentities_Success(t *testing.T) {
 	lsc, mock := newTestLiveClient(t)
 	ctx := context.Background()
 
-	mock.EXPECT().GetOwnedAssets(ctx, gomock.Any()).Return(&protobuff.OwnedAssetsResponse{
-		OwnedAssets: []*protobuff.OwnedAsset{
+	mock.EXPECT().GetAssetsForIdentities(ctx, &protobuff.GetAssetsForIdentitiesRequest{
+		Identities: []string{"ID1"},
+	}).Return(&protobuff.GetAssetsForIdentitiesResponse{
+		Assets: []*protobuff.IdentityAssets{
 			{
-				Data: &protobuff.OwnedAssetData{
-					OwnerIdentity:         "OWNER",
-					ManagingContractIndex: 1,
-					NumberOfUnits:         1000,
-					IssuedAsset: &protobuff.IssuedAssetData{
-						Name:           "CFB",
-						IssuerIdentity: "CFBM",
-					},
-				},
-				Info: &protobuff.AssetInfo{Tick: 100},
+				Identity:        "ID1",
+				OwnedAssets:     []*protobuff.OwnedAsset{ownedAsset("CFB", "CFBM", 1, 1000, 100)},
+				PossessedAssets: []*protobuff.PossessedAsset{possessedAsset("QFT", "TFUY", 1, 500, 200)},
 			},
 		},
 	}, nil)
 
-	ownerships, err := lsc.GetOwnedAssets(ctx, "OWNER")
+	identitiesAssets, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1"})
 	require.NoError(t, err)
-	require.Len(t, ownerships, 1)
-	assert.Equal(t, "CFB", ownerships[0].AssetName)
-	assert.Equal(t, "CFBM", ownerships[0].AssetIssuer)
-	assert.Equal(t, uint32(1), ownerships[0].ManagingContractIndex)
-	assert.Equal(t, int64(1000), ownerships[0].NumberOfShares)
-	assert.Equal(t, uint32(100), ownerships[0].TickNumber)
+	require.Len(t, identitiesAssets, 1)
+	assert.Equal(t, "ID1", identitiesAssets[0].Identity)
+
+	require.Len(t, identitiesAssets[0].Ownerships, 1)
+	assert.Equal(t, domain.AssetOwnership{
+		AssetIssuer:           "CFBM",
+		AssetName:             "CFB",
+		ManagingContractIndex: 1,
+		NumberOfShares:        1000,
+		TickNumber:            100,
+	}, identitiesAssets[0].Ownerships[0])
+
+	require.Len(t, identitiesAssets[0].Possessions, 1)
+	assert.Equal(t, domain.AssetPossession{
+		AssetIssuer:           "TFUY",
+		AssetName:             "QFT",
+		ManagingContractIndex: 1,
+		NumberOfShares:        500,
+		TickNumber:            200,
+	}, identitiesAssets[0].Possessions[0])
 }
 
-func TestGetOwnedAssets_UpstreamError(t *testing.T) {
+func TestGetAssetsForIdentities_MultipleIdentitiesPreservesOrder(t *testing.T) {
 	lsc, mock := newTestLiveClient(t)
 	ctx := context.Background()
 
-	mock.EXPECT().GetOwnedAssets(ctx, gomock.Any()).Return(nil, fmt.Errorf("node unavailable"))
+	mock.EXPECT().GetAssetsForIdentities(ctx, &protobuff.GetAssetsForIdentitiesRequest{
+		Identities: []string{"ID1", "ID2"},
+	}).Return(&protobuff.GetAssetsForIdentitiesResponse{
+		Assets: []*protobuff.IdentityAssets{
+			{Identity: "ID1", OwnedAssets: []*protobuff.OwnedAsset{ownedAsset("CFB", "CFBM", 1, 1, 100)}},
+			{Identity: "ID2", OwnedAssets: []*protobuff.OwnedAsset{ownedAsset("QFT", "TFUY", 1, 2, 100)}},
+		},
+	}, nil)
 
-	_, err := lsc.GetOwnedAssets(ctx, "OWNER")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "requesting owned assets from live service")
+	identitiesAssets, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1", "ID2"})
+	require.NoError(t, err)
+	require.Len(t, identitiesAssets, 2)
+	assert.Equal(t, "ID1", identitiesAssets[0].Identity)
+	assert.Equal(t, "ID2", identitiesAssets[1].Identity)
+	assert.Equal(t, "CFB", identitiesAssets[0].Ownerships[0].AssetName)
+	assert.Equal(t, "QFT", identitiesAssets[1].Ownerships[0].AssetName)
 }
 
-func TestGetPossessedAssets_Success(t *testing.T) {
+func TestGetAssetsForIdentities_IdentityWithoutAssets(t *testing.T) {
 	lsc, mock := newTestLiveClient(t)
 	ctx := context.Background()
 
-	mock.EXPECT().GetPossessedAssets(ctx, gomock.Any()).Return(&protobuff.PossessedAssetsResponse{
-		PossessedAssets: []*protobuff.PossessedAsset{
+	mock.EXPECT().GetAssetsForIdentities(ctx, gomock.Any()).Return(&protobuff.GetAssetsForIdentitiesResponse{
+		Assets: []*protobuff.IdentityAssets{{Identity: "ID1"}},
+	}, nil)
+
+	identitiesAssets, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1"})
+	require.NoError(t, err)
+	require.Len(t, identitiesAssets, 1)
+	assert.NotNil(t, identitiesAssets[0].Ownerships)
+	assert.NotNil(t, identitiesAssets[0].Possessions)
+	assert.Empty(t, identitiesAssets[0].Ownerships)
+	assert.Empty(t, identitiesAssets[0].Possessions)
+}
+
+func TestGetAssetsForIdentities_DifferentManagingContracts(t *testing.T) {
+	// Regression: an ownership and a possession for the same (asset, issuer) under different
+	// managing contracts must stay separate rows keeping their own contract index.
+	lsc, mock := newTestLiveClient(t)
+	ctx := context.Background()
+
+	mock.EXPECT().GetAssetsForIdentities(ctx, gomock.Any()).Return(&protobuff.GetAssetsForIdentitiesResponse{
+		Assets: []*protobuff.IdentityAssets{
 			{
-				Data: &protobuff.PossessedAssetData{
-					PossessorIdentity:     "POSS",
-					ManagingContractIndex: 1,
-					NumberOfUnits:         500,
-					OwnedAsset: &protobuff.OwnedAssetData{
-						IssuedAsset: &protobuff.IssuedAssetData{
-							Name:           "QFT",
-							IssuerIdentity: "TFUY",
-						},
-					},
-				},
-				Info: &protobuff.AssetInfo{Tick: 200},
+				Identity:        "ID1",
+				OwnedAssets:     []*protobuff.OwnedAsset{ownedAsset("CFB", "CFBM", 1, 1000, 100)},
+				PossessedAssets: []*protobuff.PossessedAsset{possessedAsset("CFB", "CFBM", 2, 1000, 100)},
 			},
 		},
 	}, nil)
 
-	possessions, err := lsc.GetPossessedAssets(ctx, "POSS")
+	identitiesAssets, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1"})
 	require.NoError(t, err)
-	require.Len(t, possessions, 1)
-	assert.Equal(t, "QFT", possessions[0].AssetName)
-	assert.Equal(t, "TFUY", possessions[0].AssetIssuer)
-	assert.Equal(t, uint32(1), possessions[0].ManagingContractIndex)
-	assert.Equal(t, int64(500), possessions[0].NumberOfShares)
-	assert.Equal(t, uint32(200), possessions[0].TickNumber)
+	require.Len(t, identitiesAssets[0].Ownerships, 1)
+	require.Len(t, identitiesAssets[0].Possessions, 1)
+	assert.Equal(t, uint32(1), identitiesAssets[0].Ownerships[0].ManagingContractIndex)
+	assert.Equal(t, uint32(2), identitiesAssets[0].Possessions[0].ManagingContractIndex)
 }
 
-func TestGetPossessedAssets_UpstreamError(t *testing.T) {
+func TestGetAssetsForIdentities_UpstreamError(t *testing.T) {
 	lsc, mock := newTestLiveClient(t)
 	ctx := context.Background()
 
-	mock.EXPECT().GetPossessedAssets(ctx, gomock.Any()).Return(nil, fmt.Errorf("node unavailable"))
+	mock.EXPECT().GetAssetsForIdentities(ctx, gomock.Any()).Return(nil, fmt.Errorf("node unavailable"))
 
-	_, err := lsc.GetPossessedAssets(ctx, "POSS")
+	_, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1"})
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "requesting possessed assets from live service")
+	assert.Contains(t, err.Error(), "requesting assets for identities from live service")
+}
+
+func TestGetAssetsForIdentities_ResponseLengthMismatch(t *testing.T) {
+	lsc, mock := newTestLiveClient(t)
+	ctx := context.Background()
+
+	mock.EXPECT().GetAssetsForIdentities(ctx, gomock.Any()).Return(&protobuff.GetAssetsForIdentitiesResponse{
+		Assets: []*protobuff.IdentityAssets{{Identity: "ID1"}},
+	}, nil)
+
+	_, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1", "ID2"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "returned assets for 1 identities, requested 2")
+}
+
+func TestGetAssetsForIdentities_IncompleteAssetIsRejected(t *testing.T) {
+	for name, assets := range map[string]*protobuff.IdentityAssets{
+		"owned asset without issuance record": {
+			Identity:    "ID1",
+			OwnedAssets: []*protobuff.OwnedAsset{{Data: &protobuff.OwnedAssetData{}, Info: &protobuff.AssetInfo{}}},
+		},
+		"owned asset without info": {
+			Identity:    "ID1",
+			OwnedAssets: []*protobuff.OwnedAsset{{Data: &protobuff.OwnedAssetData{IssuedAsset: &protobuff.IssuedAssetData{}}}},
+		},
+		"possessed asset without ownership record": {
+			Identity:        "ID1",
+			PossessedAssets: []*protobuff.PossessedAsset{{Data: &protobuff.PossessedAssetData{}, Info: &protobuff.AssetInfo{}}},
+		},
+		"possessed asset without info": {
+			Identity: "ID1",
+			PossessedAssets: []*protobuff.PossessedAsset{{Data: &protobuff.PossessedAssetData{
+				OwnedAsset: &protobuff.OwnedAssetData{IssuedAsset: &protobuff.IssuedAssetData{}},
+			}}},
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			lsc, mock := newTestLiveClient(t)
+			ctx := context.Background()
+
+			mock.EXPECT().GetAssetsForIdentities(ctx, gomock.Any()).Return(&protobuff.GetAssetsForIdentitiesResponse{
+				Assets: []*protobuff.IdentityAssets{assets},
+			}, nil)
+
+			_, err := lsc.GetAssetsForIdentities(ctx, []string{"ID1"})
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), "for identity ID1")
+		})
+	}
 }

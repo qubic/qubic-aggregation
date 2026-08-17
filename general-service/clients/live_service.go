@@ -78,14 +78,50 @@ func (lsc *LiveServiceClient) GetTickInfo(ctx context.Context) (domain.TickInfo,
 	}, nil
 }
 
-func (lsc *LiveServiceClient) GetOwnedAssets(ctx context.Context, identity string) ([]domain.AssetOwnership, error) {
-	response, err := lsc.client.GetOwnedAssets(ctx, &protobuff.OwnedAssetsRequest{Identity: identity})
+// GetAssetsForIdentities requests the owned and possessed assets of every given identity in
+// one call. The live service pipelines the underlying node requests over a single connection,
+// so the batch costs roughly one round trip regardless of how many identities are asked for.
+// Results come back in the order the identities were given.
+func (lsc *LiveServiceClient) GetAssetsForIdentities(ctx context.Context, identities []string) ([]domain.IdentityAssets, error) {
+	response, err := lsc.client.GetAssetsForIdentities(ctx, &protobuff.GetAssetsForIdentitiesRequest{Identities: identities})
 	if err != nil {
-		return nil, fmt.Errorf("requesting owned assets from live service: %w", err)
+		return nil, fmt.Errorf("requesting assets for identities from live service: %w", err)
 	}
 
-	ownerships := make([]domain.AssetOwnership, 0, len(response.OwnedAssets))
-	for _, asset := range response.OwnedAssets {
+	// results are positional, so a short or padded response would silently misattribute assets
+	if len(response.Assets) != len(identities) {
+		return nil, fmt.Errorf("live service returned assets for %d identities, requested %d", len(response.Assets), len(identities))
+	}
+
+	identitiesAssets := make([]domain.IdentityAssets, 0, len(response.Assets))
+	for _, assets := range response.Assets {
+		ownerships, err := convertOwnedAssets(assets.OwnedAssets)
+		if err != nil {
+			return nil, fmt.Errorf("converting owned assets for identity %s: %w", assets.Identity, err)
+		}
+
+		possessions, err := convertPossessedAssets(assets.PossessedAssets)
+		if err != nil {
+			return nil, fmt.Errorf("converting possessed assets for identity %s: %w", assets.Identity, err)
+		}
+
+		identitiesAssets = append(identitiesAssets, domain.IdentityAssets{
+			Identity:    assets.Identity,
+			Ownerships:  ownerships,
+			Possessions: possessions,
+		})
+	}
+
+	return identitiesAssets, nil
+}
+
+func convertOwnedAssets(assets []*protobuff.OwnedAsset) ([]domain.AssetOwnership, error) {
+	ownerships := make([]domain.AssetOwnership, 0, len(assets))
+	for _, asset := range assets {
+		if asset.GetData().GetIssuedAsset() == nil || asset.GetInfo() == nil {
+			return nil, fmt.Errorf("incomplete owned asset: %v", asset)
+		}
+
 		ownerships = append(ownerships, domain.AssetOwnership{
 			AssetIssuer:           asset.Data.IssuedAsset.IssuerIdentity,
 			AssetName:             asset.Data.IssuedAsset.Name,
@@ -97,14 +133,15 @@ func (lsc *LiveServiceClient) GetOwnedAssets(ctx context.Context, identity strin
 	return ownerships, nil
 }
 
-func (lsc *LiveServiceClient) GetPossessedAssets(ctx context.Context, identity string) ([]domain.AssetPossession, error) {
-	response, err := lsc.client.GetPossessedAssets(ctx, &protobuff.PossessedAssetsRequest{Identity: identity})
-	if err != nil {
-		return nil, fmt.Errorf("requesting possessed assets from live service: %w", err)
-	}
+func convertPossessedAssets(assets []*protobuff.PossessedAsset) ([]domain.AssetPossession, error) {
+	possessions := make([]domain.AssetPossession, 0, len(assets))
+	for _, asset := range assets {
+		// issuer and name come from the issuance record wrapped by the ownership record,
+		// while shares and managing contract are the possession's own
+		if asset.GetData().GetOwnedAsset().GetIssuedAsset() == nil || asset.GetInfo() == nil {
+			return nil, fmt.Errorf("incomplete possessed asset: %v", asset)
+		}
 
-	possessions := make([]domain.AssetPossession, 0, len(response.PossessedAssets))
-	for _, asset := range response.PossessedAssets {
 		possessions = append(possessions, domain.AssetPossession{
 			AssetIssuer:           asset.Data.OwnedAsset.IssuedAsset.IssuerIdentity,
 			AssetName:             asset.Data.OwnedAsset.IssuedAsset.Name,

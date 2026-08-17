@@ -43,12 +43,17 @@ func (f *fakeLiveService) GetTickInfo(_ context.Context, _ *emptypb.Empty) (*pro
 	return &protobuff.GetTickInfoResponse{TickInfo: f.tickInfo}, nil
 }
 
-func (f *fakeLiveService) GetOwnedAssets(_ context.Context, req *protobuff.OwnedAssetsRequest) (*protobuff.OwnedAssetsResponse, error) {
-	return &protobuff.OwnedAssetsResponse{OwnedAssets: f.ownedAssets[req.Identity]}, nil
-}
-
-func (f *fakeLiveService) GetPossessedAssets(_ context.Context, req *protobuff.PossessedAssetsRequest) (*protobuff.PossessedAssetsResponse, error) {
-	return &protobuff.PossessedAssetsResponse{PossessedAssets: f.possessedAssets[req.Identity]}, nil
+func (f *fakeLiveService) GetAssetsForIdentities(_ context.Context, req *protobuff.GetAssetsForIdentitiesRequest) (*protobuff.GetAssetsForIdentitiesResponse, error) {
+	// the real service answers every requested identity, in request order
+	assets := make([]*protobuff.IdentityAssets, 0, len(req.Identities))
+	for _, identity := range req.Identities {
+		assets = append(assets, &protobuff.IdentityAssets{
+			Identity:        identity,
+			OwnedAssets:     f.ownedAssets[identity],
+			PossessedAssets: f.possessedAssets[identity],
+		})
+	}
+	return &protobuff.GetAssetsForIdentitiesResponse{Assets: assets}, nil
 }
 
 type fakeStatusService struct {

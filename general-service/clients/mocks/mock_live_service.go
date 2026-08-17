@@ -83,6 +83,26 @@ func (mr *MockQubicLiveServiceClientMockRecorder) GetActiveIpos(ctx, in any, opt
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveIpos", reflect.TypeOf((*MockQubicLiveServiceClient)(nil).GetActiveIpos), varargs...)
 }
 
+// GetAssetsForIdentities mocks base method.
+func (m *MockQubicLiveServiceClient) GetAssetsForIdentities(ctx context.Context, in *protobuff.GetAssetsForIdentitiesRequest, opts ...grpc.CallOption) (*protobuff.GetAssetsForIdentitiesResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAssetsForIdentities", varargs...)
+	ret0, _ := ret[0].(*protobuff.GetAssetsForIdentitiesResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetsForIdentities indicates an expected call of GetAssetsForIdentities.
+func (mr *MockQubicLiveServiceClientMockRecorder) GetAssetsForIdentities(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetsForIdentities", reflect.TypeOf((*MockQubicLiveServiceClient)(nil).GetAssetsForIdentities), varargs...)
+}
+
 // GetBalance mocks base method.
 func (m *MockQubicLiveServiceClient) GetBalance(ctx context.Context, in *protobuff.GetBalanceRequest, opts ...grpc.CallOption) (*protobuff.GetBalanceResponse, error) {
 	m.ctrl.T.Helper()
@@ -141,6 +161,26 @@ func (mr *MockQubicLiveServiceClientMockRecorder) GetContractIpoBids(ctx, in any
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContractIpoBids", reflect.TypeOf((*MockQubicLiveServiceClient)(nil).GetContractIpoBids), varargs...)
+}
+
+// GetHealth mocks base method.
+func (m *MockQubicLiveServiceClient) GetHealth(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*protobuff.HealthResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetHealth", varargs...)
+	ret0, _ := ret[0].(*protobuff.HealthResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetHealth indicates an expected call of GetHealth.
+func (mr *MockQubicLiveServiceClientMockRecorder) GetHealth(ctx, in any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHealth", reflect.TypeOf((*MockQubicLiveServiceClient)(nil).GetHealth), varargs...)
 }
 
 // GetIssuedAssetByUniverseIndex mocks base method.
