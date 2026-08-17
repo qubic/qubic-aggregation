@@ -11,8 +11,7 @@ type LiveService interface {
 	GetContractIpoBids(ctx context.Context, contractIndex uint32) (IpoBidData, error)
 	GetTickInfo(ctx context.Context) (TickInfo, error)
 	GetBalance(ctx context.Context, identity string) (IdentityBalance, error)
-	GetOwnedAssets(ctx context.Context, identity string) ([]AssetOwnership, error)
-	GetPossessedAssets(ctx context.Context, identity string) ([]AssetPossession, error)
+	GetAssetsForIdentities(ctx context.Context, identities []string) ([]IdentityAssets, error)
 }
 
 type StatusService interface {
